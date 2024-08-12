@@ -18,6 +18,9 @@ import Profile from "../screens/Profile";
 import React from "react";
 import Register from "../screens/Register";
 import PreferencesScreen from "../screens/PreferencesScreen";
+import Searches from "../screens/Searches";
+import EditProfile from "../screens/EditProfile";
+import LanguageSelectionScreen from "../screens/LanguageSelectionScreen";
 
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createDrawerNavigator } from "@react-navigation/drawer";
@@ -122,7 +125,7 @@ function ProfileStack(props) {
       }}
     >
       <Stack.Screen
-        name="Profile"
+        name="ProfileScreen"
         component={Profile}
         options={{
           header: ({ navigation, scene }) => (
@@ -139,20 +142,37 @@ function ProfileStack(props) {
         }}
       />
       <Stack.Screen
-        name="Pro"
-        component={Pro}
+        name="EditProfile"
+        component={EditProfile}
         options={{
           header: ({ navigation, scene }) => (
             <Header
-              title=""
+              title="Editar Perfil"
               back
               white
-              transparent
               navigation={navigation}
               scene={scene}
             />
           ),
-          headerTransparent: true,
+          cardStyle: { backgroundColor: "#FFFFFF" },
+          headerTransparent: false,
+        }}
+      />
+      <Stack.Screen
+        name="LanguageSelection"
+        component={LanguageSelectionScreen}
+        options={{
+          header: ({ navigation, scene }) => (
+            <Header
+              title="Lenguaje"
+              back
+              white
+              navigation={navigation}
+              scene={scene}
+            />
+          ),
+          cardStyle: { backgroundColor: "#FFFFFF" },
+          headerTransparent: false,
         }}
       />
     </Stack.Navigator>
@@ -210,6 +230,16 @@ function HomeStack(props) {
               navigation={navigation}
               scene={scene}
             />
+          ),
+          cardStyle: { backgroundColor: "#F8F9FE" },
+        }}
+      />
+      <Stack.Screen
+        name="Busquedas"
+        component={Searches} // Asegúrate de que la pantalla Preferences esté aquí
+        options={{
+          header: ({ navigation, scene }) => (
+            <Header title="Busquedas" navigation={navigation} scene={scene} />
           ),
           cardStyle: { backgroundColor: "#F8F9FE" },
         }}
@@ -314,6 +344,20 @@ function AppStack(props) {
       <Drawer.Screen
         name="Favoritos"
         component={FavoriteAdsScreen}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Drawer.Screen
+        name="Searches"
+        component={Searches}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Drawer.Screen
+        name="Editar perfil"
+        component={EditProfile}
         options={{
           headerShown: false,
         }}
