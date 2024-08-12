@@ -24,7 +24,10 @@ export default function Home() {
           confían en <Text style={styles.boldText}>RommieOne.</Text> ¡Únete!
         </Text>
         <View style={styles.buttonRow}>
-          <TouchableOpacity style={styles.button}>
+          <TouchableOpacity 
+          style={styles.button}
+          onPress={() => navigation.navigate("Searches")}
+          >
             <Icon
               name="bookmark"
               size={16}
