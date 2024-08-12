@@ -27,7 +27,7 @@ const Profile = () => {
               <Image
                 source={{
                   uri: "https://media.vogue.es/photos/5cc7630a329302148b86b773/master/w_1600%2Cc_limit/vogue_news_383814183.jpg",
-                }} 
+                }}
                 style={styles.avatar}
               />
             </Block>
@@ -46,7 +46,9 @@ const Profile = () => {
               </Text>
             </Block>
             <Block style={styles.editProfileButton}>
-              <TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => navigation.navigate("EditProfile")}
+              >
                 <View style={styles.editProfileButtonContainer}>
                   <Text style={styles.editProfileButtonText}>
                     editar perfil
@@ -131,42 +133,62 @@ const Profile = () => {
 
       <View style={styles.footer}>
         <TouchableOpacity onPress={() => navigation.navigate("Home")}>
-          <Ionicons 
-            name="home-outline" 
-            size={24} 
-            color={route.name === 'Home' ? '#00c06b' : 'black'} 
+          <Ionicons
+            name="home-outline"
+            size={24}
+            color={route.name === "Home" ? "#00c06b" : "black"}
           />
-          <Text style={[styles.footerText, { color: route.name === 'Home' ? '#00c06b' : 'black' }]}>
+          <Text
+            style={[
+              styles.footerText,
+              { color: route.name === "Home" ? "#00c06b" : "black" },
+            ]}
+          >
             Inicio
           </Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => navigation.navigate("Favoritos")}>
-          <Ionicons 
-            name="heart-outline" 
-            size={24} 
-            color={route.name === 'Fav' ? '#00c06b' : 'black'} 
+          <Ionicons
+            name="heart-outline"
+            size={24}
+            color={route.name === "Fav" ? "#00c06b" : "black"}
           />
-          <Text style={[styles.footerText, { color: route.name === 'Fav' ? '#00c06b' : 'black' }]}>
+          <Text
+            style={[
+              styles.footerText,
+              { color: route.name === "Fav" ? "#00c06b" : "black" },
+            ]}
+          >
             Favoritos
           </Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => navigation.navigate("Chat")}>
-          <Ionicons 
-            name="chatbubble-outline" 
-            size={24} 
-            color={route.name === 'Chat' ? '#00c06b' : 'black'} 
+          <Ionicons
+            name="chatbubble-outline"
+            size={24}
+            color={route.name === "Chat" ? "#00c06b" : "black"}
           />
-          <Text style={[styles.footerText, { color: route.name === 'Chat' ? '#00c06b' : 'black' }]}>
+          <Text
+            style={[
+              styles.footerText,
+              { color: route.name === "Chat" ? "#00c06b" : "black" },
+            ]}
+          >
             Chat
           </Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => navigation.navigate("Profile")}>
-          <Ionicons 
-            name="person-outline" 
-            size={24} 
-            color={route.name === 'Profile' ? '#00c06b' : 'black'} 
+          <Ionicons
+            name="person-outline"
+            size={24}
+            color={route.name === "Profile" ? "#00c06b" : "black"}
           />
-          <Text style={[styles.footerText, { color: route.name === 'Profile' ? '#00c06b' : 'black' }]}>
+          <Text
+            style={[
+              styles.footerText,
+              { color: route.name === "Profile" ? "#00c06b" : "black" },
+            ]}
+          >
             Perfil
           </Text>
         </TouchableOpacity>
@@ -244,18 +266,18 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   interestBlock: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginTop: 15,
   },
   interestTitle: {
     fontSize: 16,
-    fontWeight: 'bold',
-    color: '#000',
+    fontWeight: "bold",
+    color: "#000",
     marginLeft: 10,
   },
   tag: {
-    backgroundColor: '#e0f7fa',
+    backgroundColor: "#e0f7fa",
     borderRadius: 15,
     paddingVertical: 5,
     paddingHorizontal: 10,
@@ -264,7 +286,7 @@ const styles = StyleSheet.create({
   },
   tagText: {
     fontSize: 14,
-    color: '#00796b',
+    color: "#00796b",
   },
 });
 
