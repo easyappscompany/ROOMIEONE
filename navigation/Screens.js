@@ -21,6 +21,11 @@ import PreferencesScreen from "../screens/PreferencesScreen";
 import Searches from "../screens/Searches";
 import EditProfile from "../screens/EditProfile";
 import LanguageSelectionScreen from "../screens/LanguageSelectionScreen";
+import LifestyleSelectionScreen from "../screens/LifestyleSelectionScreen";
+import MusicSelectScreen from "../screens/MusicSelectScreen";
+import SportsSelectScreen from "../screens/SportsSelectScreen";
+import MoviesSelectScreen from "../screens/MoviesSelectScreen";
+import PersonalitySelectScreen from "../screens/PersonalitySelectScreen";
 
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createDrawerNavigator } from "@react-navigation/drawer";
@@ -165,6 +170,91 @@ function ProfileStack(props) {
           header: ({ navigation, scene }) => (
             <Header
               title="Lenguaje"
+              back
+              white
+              navigation={navigation}
+              scene={scene}
+            />
+          ),
+          cardStyle: { backgroundColor: "#FFFFFF" },
+          headerTransparent: false,
+        }}
+      />
+      <Stack.Screen
+        name="LifeSelection"
+        component={LifestyleSelectionScreen}
+        options={{
+          header: ({ navigation, scene }) => (
+            <Header
+              title="Estilos de vida"
+              back
+              white
+              navigation={navigation}
+              scene={scene}
+            />
+          ),
+          cardStyle: { backgroundColor: "#FFFFFF" },
+          headerTransparent: false,
+        }}
+      />
+      <Stack.Screen
+        name="MusicSelection"
+        component={MusicSelectScreen}
+        options={{
+          header: ({ navigation, scene }) => (
+            <Header
+              title="Musica"
+              back
+              white
+              navigation={navigation}
+              scene={scene}
+            />
+          ),
+          cardStyle: { backgroundColor: "#FFFFFF" },
+          headerTransparent: false,
+        }}
+      />
+      <Stack.Screen
+        name="SportsSelection"
+        component={SportsSelectScreen}
+        options={{
+          header: ({ navigation, scene }) => (
+            <Header
+              title="Deportes"
+              back
+              white
+              navigation={navigation}
+              scene={scene}
+            />
+          ),
+          cardStyle: { backgroundColor: "#FFFFFF" },
+          headerTransparent: false,
+        }}
+      />
+      <Stack.Screen
+        name="MoviesSelection"
+        component={MoviesSelectScreen}
+        options={{
+          header: ({ navigation, scene }) => (
+            <Header
+              title="Peliculas"
+              back
+              white
+              navigation={navigation}
+              scene={scene}
+            />
+          ),
+          cardStyle: { backgroundColor: "#FFFFFF" },
+          headerTransparent: false,
+        }}
+      />
+      <Stack.Screen
+        name="PersonalitySelection"
+        component={PersonalitySelectScreen}
+        options={{
+          header: ({ navigation, scene }) => (
+            <Header
+              title="Personalidad"
               back
               white
               navigation={navigation}
@@ -358,6 +448,41 @@ function AppStack(props) {
       <Drawer.Screen
         name="Editar perfil"
         component={EditProfile}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Drawer.Screen
+        name="Estilos de vida"
+        component={LifestyleSelectionScreen}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Drawer.Screen
+        name="Musica"
+        component={MusicSelectScreen}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Drawer.Screen
+        name="Deportes"
+        component={SportsSelectScreen}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Drawer.Screen
+        name="Peliculas"
+        component={MoviesSelectScreen}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Drawer.Screen
+        name="Personalidad"
+        component={PersonalitySelectScreen}
         options={{
           headerShown: false,
         }}

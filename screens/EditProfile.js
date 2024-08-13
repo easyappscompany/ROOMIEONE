@@ -213,7 +213,7 @@ const EditProfile = ({ navigation }) => {
 
         <TouchableOpacity
           style={styles.item}
-          onPress={() => handlePress("traits")}
+          onPress={() => handlePress("Personalidad")}
         >
           <View style={styles.iconContainer}>
             <Icon name="person" size={24} color="#4A90E2" />
@@ -226,7 +226,7 @@ const EditProfile = ({ navigation }) => {
 
         <TouchableOpacity
           style={styles.item}
-          onPress={() => handlePress("lifestyle")}
+          onPress={() => handlePress("Estilos de vida")}
         >
           <View style={styles.iconContainer}>
             <Icon name="spa" size={24} color="#4A90E2" />
@@ -239,7 +239,7 @@ const EditProfile = ({ navigation }) => {
 
         <TouchableOpacity
           style={styles.item}
-          onPress={() => handlePress("music")}
+          onPress={() => handlePress("Musica")}
         >
           <View style={styles.iconContainer}>
             <Icon name="music-note" size={24} color="#4A90E2" />
@@ -252,7 +252,7 @@ const EditProfile = ({ navigation }) => {
 
         <TouchableOpacity
           style={styles.item}
-          onPress={() => handlePress("sports")}
+          onPress={() => handlePress("Deportes")}
         >
           <View style={styles.iconContainer}>
             <Icon name="sports-baseball" size={24} color="#4A90E2" />
@@ -265,7 +265,7 @@ const EditProfile = ({ navigation }) => {
 
         <TouchableOpacity
           style={styles.item}
-          onPress={() => handlePress("movies")}
+          onPress={() => handlePress("Peliculas")}
         >
           <View style={styles.iconContainer}>
             <Icon name="local-movies" size={24} color="#4A90E2" />
