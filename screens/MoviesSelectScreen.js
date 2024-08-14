@@ -49,9 +49,6 @@ const MoviesSelectScreen = ({ navigation }) => {
         <TouchableOpacity style={styles.roundButton} onPress={handleSave}>
           <Text style={styles.buttonText}>Guardar</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.roundButton} onPress={() => navigation.goBack()}>
-          <Text style={styles.buttonText}>Salir</Text>
-        </TouchableOpacity>
       </View>
     </View>
   );

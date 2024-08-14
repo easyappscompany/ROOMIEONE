@@ -94,6 +94,7 @@ const styles = StyleSheet.create({
       flexDirection: 'row',
       justifyContent: 'space-around',
       marginTop: 20,
+      padding: 20
     },
     roundButton: {
       backgroundColor: '#4A90E2',

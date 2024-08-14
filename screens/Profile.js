@@ -26,7 +26,7 @@ const Profile = () => {
             <Block middle style={styles.avatarContainer}>
               <Image
                 source={{
-                  uri: "https://media.vogue.es/photos/5cc7630a329302148b86b773/master/w_1600%2Cc_limit/vogue_news_383814183.jpg",
+                  uri: "https://wallpapers-clan.com/wp-content/uploads/2023/11/halo-master-chief-clouds-desktop-wallpaper-preview.jpg",
                 }}
                 style={styles.avatar}
               />

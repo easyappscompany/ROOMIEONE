@@ -25,7 +25,6 @@ const PersonalitySelectScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Selecciona tus rasgos de personalidad</Text>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         {personalityOptions.map((option, index) => (
           <TouchableOpacity
@@ -51,9 +50,6 @@ const PersonalitySelectScreen = ({ navigation }) => {
         <TouchableOpacity style={styles.roundButton} onPress={handleSave}>
           <Text style={styles.buttonText}>Guardar</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.roundButton} onPress={() => navigation.goBack()}>
-          <Text style={styles.buttonText}>Salir</Text>
-        </TouchableOpacity>
       </View>
     </View>
   );
@@ -63,7 +59,8 @@ const styles = StyleSheet.create({
     container: {
       flex: 1,
       backgroundColor: '#f0f0f0',
-      paddingHorizontal: 20,
+      paddingTop: 55,
+      paddingHorizontal: 25,
     },
     title: {
       fontSize: 24,
@@ -95,6 +92,7 @@ const styles = StyleSheet.create({
     buttonContainer: {
       flexDirection: 'row',
       justifyContent: 'space-around',
+      padding: 20,
       marginTop: 20,
     },
     roundButton: {

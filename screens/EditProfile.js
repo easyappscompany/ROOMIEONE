@@ -279,7 +279,7 @@ const EditProfile = ({ navigation }) => {
 
       <TouchableOpacity
         style={styles.saveButton}
-        onPress={() => navigation.goBack()}
+        onPress={() => navigation.navigate('ProfileScreen')}
       >
         <Icon name="save" size={24} color="white" />
       </TouchableOpacity>
@@ -341,14 +341,14 @@ const styles = StyleSheet.create({
   addPhoto: {
     width: "30%",
     height: 100,
-    backgroundColor: "#f0f0f0",
+    backgroundColor: "#c2c2c2",
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 5,
   },
   addPhotoText: {
     fontSize: 24,
-    color: "#ccc",
+    color: "#000",
   },
   removeButton: {
     position: "absolute",

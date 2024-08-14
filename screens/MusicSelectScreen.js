@@ -49,9 +49,6 @@ const MusicSelectScreen = ({ navigation }) => {
         <TouchableOpacity style={styles.roundButton} onPress={handleSave}>
           <Text style={styles.buttonText}>Guardar</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.roundButton} onPress={() => navigation.goBack()}>
-          <Text style={styles.buttonText}>Salir</Text>
-        </TouchableOpacity>
       </View>
     </View>
   );
@@ -61,6 +58,7 @@ const styles = StyleSheet.create({
     container: {
       flex: 1,
       backgroundColor: '#f0f0f0',
+      paddingTop: 55,
       paddingHorizontal: 20,
     },
     title: {
@@ -94,6 +92,7 @@ const styles = StyleSheet.create({
       flexDirection: 'row',
       justifyContent: 'space-around',
       marginTop: 20,
+      padding: 20
     },
     roundButton: {
       backgroundColor: '#4A90E2',
