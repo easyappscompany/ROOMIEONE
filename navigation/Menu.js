@@ -20,7 +20,7 @@ function CustomDrawerContent({
       forceInset={{ top: "always", horizontal: "never" }}
     >
       <Block flex={0.06} style={styles.header}>
-        <Image styles={styles.logo} source={Images.Logo} />
+        <Image style={styles.logo} source={Images.Logo} />
       </Block>
       <Block flex style={{ paddingLeft: 8, paddingRight: 14 }}>
         <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
@@ -65,6 +65,12 @@ const styles = StyleSheet.create({
     paddingBottom: theme.SIZES.BASE,
     paddingTop: theme.SIZES.BASE * 3,
     justifyContent: "center",
+    alignItems: "center", // Centra el logo horizontalmente
+  },
+  logo: {
+    width: 65, // Cambia el tamaño del logo según sea necesario
+    height: 65, 
+    resizeMode: "contain", // Asegura que la imagen se ajuste dentro de las dimensiones
   },
 });
 

@@ -21,6 +21,8 @@ const EditProfile = ({ navigation }) => {
   const [birthDate, setBirthDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [formattedDate, setFormattedDate] = useState("");
+  const [rfc, setRfc] = useState(""); // Nuevo estado para RFC
+  const [claveElector, setClaveElector] = useState(""); // Nuevo estado para Clave de Elector
   const [gender, setGender] = useState(""); // 'male' or 'female'
   const [occupation, setOccupation] = useState("");
   const [selectedLanguages, setSelectedLanguages] = useState([]);
@@ -73,7 +75,6 @@ const EditProfile = ({ navigation }) => {
   };
 
   const handlePress = (field) => {
-    // Navega a la pantalla de edición específica según el campo
     navigation.navigate(field);
   };
 
@@ -104,31 +105,50 @@ const EditProfile = ({ navigation }) => {
         </View>
         <Text style={styles.photoCount}>{photos.length}/6</Text>
 
-        <TextInput
-          style={styles.input}
-          placeholder="Nombre(s)"
-          value={firstName}
-          onChangeText={setFirstName}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Apellido(s)"
-          value={lastName}
-          onChangeText={setLastName}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Nacionalidad"
-          value={country}
-          onChangeText={setCountry}
-        />
-        <TouchableOpacity onPress={showDatepicker}>
+        {/* Input con icono */}
+        <View style={styles.inputContainer}>
+          <Icon name="person" size={20} color="#666" style={styles.inputIcon} />
           <TextInput
-            style={styles.dateInput}
-            placeholder="Fecha de nacimiento"
-            value={formattedDate}
-            editable={false}
+            style={styles.input}
+            placeholder="Nombre(s)"
+            value={firstName}
+            onChangeText={setFirstName}
           />
+        </View>
+
+        {/* Input con icono */}
+        <View style={styles.inputContainer}>
+          <Icon name="people" size={20} color="#666" style={styles.inputIcon} />
+          <TextInput
+            style={styles.input}
+            placeholder="Apellido(s)"
+            value={lastName}
+            onChangeText={setLastName}
+          />
+        </View>
+
+        {/* Input con icono */}
+        <View style={styles.inputContainer}>
+          <Icon name="public" size={20} color="#666" style={styles.inputIcon} />
+          <TextInput
+            style={styles.input}
+            placeholder="Nacionalidad"
+            value={country}
+            onChangeText={setCountry}
+          />
+        </View>
+
+        {/* Input con icono */}
+        <TouchableOpacity onPress={showDatepicker}>
+          <View style={styles.inputContainer}>
+            <Icon name="calendar-today" size={20} color="#666" style={styles.inputIcon} />
+            <TextInput
+              style={styles.dateInput}
+              placeholder="Fecha de nacimiento"
+              value={formattedDate}
+              editable={false}
+            />
+          </View>
         </TouchableOpacity>
         {showDatePicker && (
           <DateTimePicker
@@ -138,6 +158,28 @@ const EditProfile = ({ navigation }) => {
             onChange={onChange}
           />
         )}
+
+        {/* Input con icono para RFC */}
+        <View style={styles.inputContainer}>
+          <Icon name="assignment-ind" size={20} color="#666" style={styles.inputIcon} />
+          <TextInput
+            style={styles.input}
+            placeholder="RFC"
+            value={rfc}
+            onChangeText={setRfc}
+          />
+        </View>
+
+        {/* Input con icono para Clave de Elector */}
+        <View style={styles.inputContainer}>
+          <Icon name="fingerprint" size={20} color="#666" style={styles.inputIcon} />
+          <TextInput
+            style={styles.input}
+            placeholder="Clave de elector"
+            value={claveElector}
+            onChangeText={setClaveElector}
+          />
+        </View>
 
         <Text style={styles.sectionTitle}>Género</Text>
         <View style={styles.genderContainer}>
@@ -201,87 +243,24 @@ const EditProfile = ({ navigation }) => {
         </View>
 
         <TouchableOpacity onPress={openLanguageSelection}>
-          <TextInput
-            style={styles.input}
-            placeholder="Idiomas"
-            value={selectedLanguages.join(", ")}
-            editable={false}
-          />
-        </TouchableOpacity>
-
-        <Text style={styles.sectionTitle}>Sobre ti</Text>
-
-        <TouchableOpacity
-          style={styles.item}
-          onPress={() => handlePress("Personalidad")}
-        >
-          <View style={styles.iconContainer}>
-            <Icon name="person" size={24} color="#4A90E2" />
-          </View>
-          <View style={styles.textContainer}>
-            <Text style={styles.question}>¿Cómo eres?</Text>
-            <Text style={styles.answer}>{aboutYou}</Text>
+          <View style={styles.inputContainer}>
+            <Icon name="language" size={20} color="#666" style={styles.inputIcon} />
+            <TextInput
+              style={styles.input}
+              placeholder="Idiomas"
+              value={selectedLanguages.join(", ")}
+              editable={false}
+            />
           </View>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.item}
-          onPress={() => handlePress("Estilos de vida")}
-        >
-          <View style={styles.iconContainer}>
-            <Icon name="spa" size={24} color="#4A90E2" />
-          </View>
-          <View style={styles.textContainer}>
-            <Text style={styles.question}>¿Cuál es tu estilo de vida?</Text>
-            <Text style={styles.answer}>{lifestyle}</Text>
-          </View>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.item}
-          onPress={() => handlePress("Musica")}
-        >
-          <View style={styles.iconContainer}>
-            <Icon name="music-note" size={24} color="#4A90E2" />
-          </View>
-          <View style={styles.textContainer}>
-            <Text style={styles.question}>¿Qué música escuchas?</Text>
-            <Text style={styles.answer}>{music}</Text>
-          </View>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.item}
-          onPress={() => handlePress("Deportes")}
-        >
-          <View style={styles.iconContainer}>
-            <Icon name="sports-baseball" size={24} color="#4A90E2" />
-          </View>
-          <View style={styles.textContainer}>
-            <Text style={styles.question}>¿Qué deportes practicas?</Text>
-            <Text style={styles.answer}>{sports}</Text>
-          </View>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.item}
-          onPress={() => handlePress("Peliculas")}
-        >
-          <View style={styles.iconContainer}>
-            <Icon name="local-movies" size={24} color="#4A90E2" />
-          </View>
-          <View style={styles.textContainer}>
-            <Text style={styles.question}>¿Qué películas ves?</Text>
-            <Text style={styles.answer}>{movies}</Text>
-          </View>
-        </TouchableOpacity>
       </ScrollView>
 
       <TouchableOpacity
         style={styles.saveButton}
-        onPress={() => navigation.navigate('ProfileScreen')}
+        onPress={() => navigation.navigate("Home")}
       >
-        <Icon name="save" size={24} color="white" />
+        <Icon name="save" size={24} color="#fff" />
       </TouchableOpacity>
     </View>
   );
@@ -290,10 +269,10 @@ const EditProfile = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    padding: 20,
   },
   scrollViewContent: {
-    padding: 20,
-    paddingBottom: 10, // Espacio para evitar que el contenido sea ocultado por el botón
+    paddingBottom: 100,
   },
   sectionTitle: {
     fontSize: 18,
@@ -302,31 +281,35 @@ const styles = StyleSheet.create({
   },
   sectionSubtitle: {
     fontSize: 14,
-    marginBottom: 10,
     color: "#666",
+    marginBottom: 20,
+  },
+  inputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderBottomWidth: 1,
+    borderColor: "#d6d6d6",
+    paddingHorizontal: 10,
+    marginBottom: 20,
+  },
+  inputIcon: {
+    marginRight: 10,
   },
   input: {
+    flex: 1,
     height: 50,
-    borderColor: "#ccc",
-    borderWidth: 1,
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    marginBottom: 20,
+    fontSize: 16,
   },
   dateInput: {
+    flex: 1,
     height: 50,
-    borderColor: "#ccc",
-    borderWidth: 1,
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    justifyContent: "center",
-    marginBottom: 20,
+    fontSize: 16,
+    color: "#333",
   },
   photoGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-between",
-    marginBottom: 10,
   },
   photoItem: {
     width: "30%",
@@ -403,25 +386,6 @@ const styles = StyleSheet.create({
   },
   picker: {
     height: 50,
-  },
-  item: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  iconContainer: {
-    marginRight: 15,
-  },
-  textContainer: {
-    flex: 1,
-  },
-  question: {
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  answer: {
-    fontSize: 14,
-    color: "#666",
   },
   saveButton: {
     position: "absolute",

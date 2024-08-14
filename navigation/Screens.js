@@ -12,6 +12,7 @@ import ChatScreen from "../screens/ChatScreen";
 import FavoriteAdsScreen from "../screens/FavoriteAdsScreen";
 // screens
 import Home from "../screens/Home";
+import LoginScreen from "../screens/Login";
 import Onboarding from "../screens/Onboarding";
 import Pro from "../screens/Pro";
 import Profile from "../screens/Profile";
@@ -26,6 +27,7 @@ import MusicSelectScreen from "../screens/MusicSelectScreen";
 import SportsSelectScreen from "../screens/SportsSelectScreen";
 import MoviesSelectScreen from "../screens/MoviesSelectScreen";
 import PersonalitySelectScreen from "../screens/PersonalitySelectScreen";
+import PhoneVerificationScreen from "../screens/PhoneVerificationScreen";
 
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createDrawerNavigator } from "@react-navigation/drawer";
@@ -300,6 +302,16 @@ function HomeStack(props) {
           cardStyle: { backgroundColor: "#F8F9FE" },
         }}
       />
+      <Stack.Screen
+        name="Login"
+        component={LoginScreen} // Asegúrate de que la pantalla Preferences esté aquí
+        options={{
+          header: ({ navigation, scene }) => (
+            <Header title="Busquedas" navigation={navigation} scene={scene} />
+          ),
+          cardStyle: { backgroundColor: "#F8F9FE" },
+        }}
+      />
     </Stack.Navigator>
   );
 }
@@ -315,6 +327,35 @@ export default function OnboardingStack(props) {
       <Stack.Screen
         name="Onboarding"
         component={Onboarding}
+        option={{
+          headerTransparent: true,
+        }}
+      />
+
+      <Drawer.Screen
+        name="Login"
+        component={LoginScreen}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="PhoneVerification"
+        component={PhoneVerificationScreen}
+        options={{
+          header: ({ navigation, scene }) => (
+            <Header
+              title="PhoneVerification"
+              navigation={navigation}
+              scene={scene}
+            />
+          ),
+          cardStyle: { backgroundColor: "#F8F9FE" },
+        }}
+      />
+      <Stack.Screen
+        name="Home"
+        component={HomeStack}
         option={{
           headerTransparent: true,
         }}
@@ -362,6 +403,7 @@ function AppStack(props) {
           headerShown: false,
         }}
       />
+
       <Drawer.Screen
         name="Profile"
         component={ProfileStack}
@@ -446,12 +488,10 @@ function AppStack(props) {
           headerShown: false,
         }}
       />
-      <Drawer.Screen
-        name="Personalidad"
-        component={PersonalitySelectScreen}
-        options={{
-          headerShown: false,
-        }}
+      <Stack.Screen
+        name="PhoneVerification"
+        component={PhoneVerificationScreen}
+        options={{ headerShown: false }}
       />
     </Drawer.Navigator>
   );
