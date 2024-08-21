@@ -2,6 +2,7 @@
   "expo": {
     "name": "Argon FREE React Native",
     "slug": "argon-free-react-native",
+    "scheme": "argon-free-react-native",
     "privacy": "public",
     "platforms": [
       "ios",
@@ -16,7 +17,8 @@
       "backgroundColor": "#ffffff"
     },
     "updates": {
-      "fallbackToCacheTimeout": 0
+      "fallbackToCacheTimeout": 0,
+      "expoUsername": "easyappscompany"
     },
     "assetBundlePatterns": [
       "**/*"
@@ -24,6 +26,9 @@
     "ios": {
       "supportsTablet": true
     },
-    "description": "Argon React Native, based on Argon Design System. Coded by Creative Tim"
+    "description": "Argon React Native, based on Argon Design System. Coded by Creative Tim",
+    "android": {
+      "package": "com.easyappscompany.argonfreereactnative"
+    }
   }
 }

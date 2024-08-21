@@ -12,7 +12,6 @@ const PhoneVerificationScreen = ({ navigation }) => {
     const recaptchaVerifier = useRef(null);
 
     const sendVerification = () => {
-        // Agregar +52 si no está presente
         const fullPhoneNumber = phoneNumber.startsWith('+52') ? phoneNumber : `+52${phoneNumber}`;
         
         const phoneProvider = new firebase.auth.PhoneAuthProvider();
@@ -72,6 +71,11 @@ const PhoneVerificationScreen = ({ navigation }) => {
                 />
                 <TouchableOpacity style={styles.sendCode} onPress={confirmCode}>
                     <Text style={styles.buttonText}>Confirmar verificación</Text>
+                </TouchableOpacity>
+
+                {/* Nuevo botón para ir directamente a Home */}
+                <TouchableOpacity style={styles.skipButton} onPress={() => navigation.navigate('Home')}>
+                    <Text style={styles.buttonText}>Omitir verificación</Text>
                 </TouchableOpacity>
             </View>
         </ImageBackground>
@@ -155,5 +159,14 @@ const styles = StyleSheet.create({
     buttonText: {
         color: '#fff',
         fontSize: 16,
+    },
+    skipButton: {
+        backgroundColor: '#4caf50',
+        paddingVertical: 15,
+        paddingHorizontal: 30,
+        borderRadius: 5,
+        marginTop: 20,
+        width: '100%',
+        alignItems: 'center',
     },
 });

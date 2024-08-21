@@ -1,498 +1,100 @@
-import { Animated, Dimensions, Easing } from "react-native";
-// header for screens
-import { Header, Icon } from "../components";
-import { argonTheme, tabs } from "../constants";
+import React from "react";
+import { Dimensions } from "react-native";
+import { createStackNavigator } from "@react-navigation/stack";
+import { createDrawerNavigator } from "@react-navigation/drawer";
 
-import Articles from "../screens/Articles";
-import { Block } from "galio-framework";
-// drawer
-import CustomDrawerContent from "./Menu";
-import Elements from "../screens/Elements";
+// Importar las pantallas necesarias
+import Onboarding from "../screens/Onboarding";
+import Login from "../screens/Login"; // Importa la pantalla de Login
+import PhoneVerificationScreen from "../screens/PhoneVerificationScreen";
+import Home from "../screens/Home";
 import ChatScreen from "../screens/ChatScreen";
 import FavoriteAdsScreen from "../screens/FavoriteAdsScreen";
-// screens
-import Home from "../screens/Home";
-import LoginScreen from "../screens/Login";
-import Onboarding from "../screens/Onboarding";
-import Pro from "../screens/Pro";
 import Profile from "../screens/Profile";
-import React from "react";
-import Register from "../screens/Register";
-import PreferencesScreen from "../screens/PreferencesScreen";
-import Searches from "../screens/Searches";
 import EditProfile from "../screens/EditProfile";
-import LanguageSelectionScreen from "../screens/LanguageSelectionScreen";
-import LifestyleSelectionScreen from "../screens/LifestyleSelectionScreen";
-import MusicSelectScreen from "../screens/MusicSelectScreen";
-import SportsSelectScreen from "../screens/SportsSelectScreen";
-import MoviesSelectScreen from "../screens/MoviesSelectScreen";
-import PersonalitySelectScreen from "../screens/PersonalitySelectScreen";
-import PhoneVerificationScreen from "../screens/PhoneVerificationScreen";
-
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { createDrawerNavigator } from "@react-navigation/drawer";
-import { createStackNavigator } from "@react-navigation/stack";
+import PreferencesScreen from "../screens/PreferencesScreen";
+import Searches from "../screens/Searches"
 
 const { width } = Dimensions.get("screen");
 
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
-const Tab = createBottomTabNavigator();
 
-function ChatStack(props) {
+// Stack para el Onboarding, Login, y la verificación de teléfono
+function OnboardingStack() {
   return (
-    <Stack.Navigator
-      screenOptions={{
-        mode: "card",
-        headerShown: false,
-      }}
-    >
-      <Stack.Screen
-        name="Chat"
-        component={ChatScreen}
-        options={{
-          header: ({ navigation, scene }) => (
-            <Header title="Chat" navigation={navigation} scene={scene} />
-          ),
-          cardStyle: { backgroundColor: "#F8F9FE" },
-        }}
-      />
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="Onboarding" component={Onboarding} />
+      <Stack.Screen name="Login" component={Login} /> 
+      <Stack.Screen name="PhoneVerification" component={PhoneVerificationScreen} />
+      <Stack.Screen name="Home" component={HomeDrawerStack} />
     </Stack.Navigator>
   );
 }
 
-function FavoriteStack(props) {
-  return (
-    <Stack.Navigator
-      screenOptions={{
-        mode: "card",
-        headerShown: false,
-      }}
-    >
-      <Stack.Screen
-        name="ChatScreen"
-        component={FavoriteAdsScreen}
-        options={{
-          header: ({ navigation, scene }) => (
-            <Header title="Favoritos" navigation={navigation} scene={scene} />
-          ),
-          cardStyle: { backgroundColor: "#F8F9FE" },
-        }}
-      />
-    </Stack.Navigator>
-  );
-}
-
-function ArticlesStack(props) {
-  return (
-    <Stack.Navigator
-      screenOptions={{
-        mode: "card",
-        headerShown: "screen",
-      }}
-    >
-      <Stack.Screen
-        name="Articles"
-        component={Articles}
-        options={{
-          header: ({ navigation, scene }) => (
-            <Header title="Articles" navigation={navigation} scene={scene} />
-          ),
-          cardStyle: { backgroundColor: "#F8F9FE" },
-        }}
-      />
-    </Stack.Navigator>
-  );
-}
-
-function ProfileStack(props) {
-  return (
-    <Stack.Navigator
-      initialRouteName="Profile"
-      screenOptions={{
-        mode: "card",
-        headerShown: "screen",
-      }}
-    >
-      <Stack.Screen
-        name="ProfileScreen"
-        component={Profile}
-        options={{
-          header: ({ navigation, scene }) => (
-            <Header
-              transparent
-              white
-              title="Profile"
-              navigation={navigation}
-              scene={scene}
-            />
-          ),
-          cardStyle: { backgroundColor: "#FFFFFF" },
-          headerTransparent: true,
-        }}
-      />
-      <Stack.Screen
-        name="EditProfile"
-        component={EditProfile}
-        options={{
-          header: ({ navigation, scene }) => (
-            <Header
-              title="Editar Perfil"
-              back
-              white
-              navigation={navigation}
-              scene={scene}
-            />
-          ),
-          cardStyle: { backgroundColor: "#FFFFFF" },
-          headerTransparent: false,
-        }}
-      />
-      <Stack.Screen
-        name="LanguageSelection"
-        component={LanguageSelectionScreen}
-        options={{
-          header: ({ navigation, scene }) => (
-            <Header
-              title="Lenguaje"
-              back
-              white
-              navigation={navigation}
-              scene={scene}
-            />
-          ),
-          cardStyle: { backgroundColor: "#FFFFFF" },
-          headerTransparent: false,
-        }}
-      />
-      <Stack.Screen
-        name="LifeSelection"
-        component={LifestyleSelectionScreen}
-        options={{
-          header: ({ navigation, scene }) => (
-            <Header
-              title="Estilos de vida"
-              back
-              white
-              navigation={navigation}
-              scene={scene}
-            />
-          ),
-          cardStyle: { backgroundColor: "#FFFFFF" },
-          headerTransparent: false,
-        }}
-      />
-      <Stack.Screen
-        name="MusicSelection"
-        component={MusicSelectScreen}
-        options={{
-          header: ({ navigation, scene }) => (
-            <Header
-              title="Musica"
-              back
-              white
-              navigation={navigation}
-              scene={scene}
-            />
-          ),
-          cardStyle: { backgroundColor: "#FFFFFF" },
-          headerTransparent: false,
-        }}
-      />
-      <Stack.Screen
-        name="SportsSelection"
-        component={SportsSelectScreen}
-        options={{
-          header: ({ navigation, scene }) => (
-            <Header
-              title="Deportes"
-              back
-              white
-              navigation={navigation}
-              scene={scene}
-            />
-          ),
-          cardStyle: { backgroundColor: "#FFFFFF" },
-          headerTransparent: false,
-        }}
-      />
-      <Stack.Screen
-        name="MoviesSelection"
-        component={MoviesSelectScreen}
-        options={{
-          header: ({ navigation, scene }) => (
-            <Header
-              title="Peliculas"
-              back
-              white
-              navigation={navigation}
-              scene={scene}
-            />
-          ),
-          cardStyle: { backgroundColor: "#FFFFFF" },
-          headerTransparent: false,
-        }}
-      />
-      <Stack.Screen
-        name="PersonalitySelection"
-        component={PersonalitySelectScreen}
-        options={{
-          header: ({ navigation, scene }) => (
-            <Header
-              title="Personalidad"
-              back
-              white
-              navigation={navigation}
-              scene={scene}
-            />
-          ),
-          cardStyle: { backgroundColor: "#FFFFFF" },
-          headerTransparent: false,
-        }}
-      />
-    </Stack.Navigator>
-  );
-}
-
-function HomeStack(props) {
-  return (
-    <Stack.Navigator
-      screenOptions={{
-        mode: "card",
-        headerShown: "screen",
-      }}
-    >
-      <Stack.Screen
-        name="Home"
-        component={Home}
-        options={{
-          header: ({ navigation, scene }) => (
-            <Header
-              title="Home"
-              search
-              options
-              navigation={navigation}
-              scene={scene}
-            />
-          ),
-          cardStyle: { backgroundColor: "#F8F9FE" },
-        }}
-      />
-      <Stack.Screen
-        name="Preferences"
-        component={PreferencesScreen} // Asegúrate de que la pantalla Preferences esté aquí
-        options={{
-          header: ({ navigation, scene }) => (
-            <Header
-              title="Preferencias"
-              navigation={navigation}
-              scene={scene}
-            />
-          ),
-          cardStyle: { backgroundColor: "#F8F9FE" },
-        }}
-      />
-      <Stack.Screen
-        name="Busquedas"
-        component={Searches} // Asegúrate de que la pantalla Preferences esté aquí
-        options={{
-          header: ({ navigation, scene }) => (
-            <Header title="Busquedas" navigation={navigation} scene={scene} />
-          ),
-          cardStyle: { backgroundColor: "#F8F9FE" },
-        }}
-      />
-      <Stack.Screen
-        name="Login"
-        component={LoginScreen} // Asegúrate de que la pantalla Preferences esté aquí
-        options={{
-          header: ({ navigation, scene }) => (
-            <Header title="Busquedas" navigation={navigation} scene={scene} />
-          ),
-          cardStyle: { backgroundColor: "#F8F9FE" },
-        }}
-      />
-    </Stack.Navigator>
-  );
-}
-
-export default function OnboardingStack(props) {
-  return (
-    <Stack.Navigator
-      screenOptions={{
-        mode: "card",
-        headerShown: false,
-      }}
-    >
-      <Stack.Screen
-        name="Onboarding"
-        component={Onboarding}
-        option={{
-          headerTransparent: true,
-        }}
-      />
-
-      <Drawer.Screen
-        name="Login"
-        component={LoginScreen}
-        options={{
-          headerShown: false,
-        }}
-      />
-      <Stack.Screen
-        name="PhoneVerification"
-        component={PhoneVerificationScreen}
-        options={{
-          header: ({ navigation, scene }) => (
-            <Header
-              title="PhoneVerification"
-              navigation={navigation}
-              scene={scene}
-            />
-          ),
-          cardStyle: { backgroundColor: "#F8F9FE" },
-        }}
-      />
-      <Stack.Screen
-        name="Home"
-        component={HomeStack}
-        option={{
-          headerTransparent: true,
-        }}
-      />
-      <Stack.Screen name="App" component={AppStack} />
-    </Stack.Navigator>
-  );
-}
-
-function AppStack(props) {
+// Drawer principal que contiene la navegación después de iniciar sesión
+function HomeDrawerStack() {
   return (
     <Drawer.Navigator
-      style={{ flex: 1 }}
-      drawerContent={(props) => <CustomDrawerContent {...props} />}
-      drawerStyle={{
-        backgroundColor: "white",
-        width: width * 0.8,
-      }}
       drawerContentOptions={{
-        activeTintcolor: "white",
+        activeTintColor: "white",
         inactiveTintColor: "#000",
-        activeBackgroundColor: "transparent",
-        itemStyle: {
-          width: width * 0.75,
-          backgroundColor: "transparent",
-          paddingVertical: 16,
-          paddingHorizonal: 12,
-          justifyContent: "center",
-          alignContent: "center",
-          alignItems: "center",
-          overflow: "hidden",
-        },
-        labelStyle: {
-          fontSize: 18,
-          marginLeft: 12,
-          fontWeight: "normal",
-        },
+        itemStyle: { marginVertical: 5 },
+        labelStyle: { fontSize: 18 },
       }}
+      drawerStyle={{ width: width * 0.8 }}
       initialRouteName="Home"
     >
-      <Drawer.Screen
-        name="HomeScreen"
-        component={HomeStack}
-        options={{
-          headerShown: false,
-        }}
-      />
-
-      <Drawer.Screen
-        name="Profile"
-        component={ProfileStack}
-        options={{
-          headerShown: false,
-        }}
-      />
-      <Drawer.Screen
-        name="Account"
-        component={Register}
-        options={{
-          headerShown: false,
-        }}
-      />
-      <Drawer.Screen
-        name="Chat"
-        component={ChatStack}
-        options={{
-          headerShown: false,
-        }}
-      />
-      <Drawer.Screen
-        name="Articles"
-        component={ArticlesStack}
-        options={{
-          headerShown: false,
-        }}
-      />
-      <Drawer.Screen
-        name="Preferencias"
-        component={PreferencesScreen}
-        options={{
-          headerShown: false,
-        }}
-      />
-      <Drawer.Screen
-        name="Favoritos"
-        component={FavoriteAdsScreen}
-        options={{
-          headerShown: false,
-        }}
-      />
-      <Drawer.Screen
-        name="Searches"
-        component={Searches}
-        options={{
-          headerShown: false,
-        }}
-      />
-      <Drawer.Screen
-        name="Editar perfil"
-        component={EditProfile}
-        options={{
-          headerShown: false,
-        }}
-      />
-      <Drawer.Screen
-        name="Estilos de vida"
-        component={LifestyleSelectionScreen}
-        options={{
-          headerShown: false,
-        }}
-      />
-      <Drawer.Screen
-        name="Musica"
-        component={MusicSelectScreen}
-        options={{
-          headerShown: false,
-        }}
-      />
-      <Drawer.Screen
-        name="Deportes"
-        component={SportsSelectScreen}
-        options={{
-          headerShown: false,
-        }}
-      />
-      <Drawer.Screen
-        name="Peliculas"
-        component={MoviesSelectScreen}
-        options={{
-          headerShown: false,
-        }}
-      />
-      <Stack.Screen
-        name="PhoneVerification"
-        component={PhoneVerificationScreen}
-        options={{ headerShown: false }}
-      />
+      <Drawer.Screen name="Home" component={HomeStack} />
+      <Drawer.Screen name="Chat" component={ChatStack} />
+      <Drawer.Screen name="Favoritos" component={FavoriteStack} />
+      <Drawer.Screen name="Profile" component={ProfileStack} />
+      <Drawer.Screen name="Preferences" component={PreferencesScreen} />
     </Drawer.Navigator>
   );
+}
+
+// Stack para la pantalla Home y sus subpantallas
+function HomeStack() {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="Home" component={Home} />
+      <Stack.Screen name="Chat" component={ChatScreen} />
+      <Stack.Screen name="Favoritos" component={FavoriteAdsScreen} />
+      <Stack.Screen name="Preferences" component={PreferencesScreen} />
+      <Stack.Screen name="Searches" component={Searches} />
+    </Stack.Navigator>
+  );
+}
+
+// Stack para el perfil y la edición de perfil
+function ProfileStack() {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="Profile" component={Profile} />
+      <Stack.Screen name="EditProfile" component={EditProfile} />
+    </Stack.Navigator>
+  );
+}
+
+// Stack para el chat
+function ChatStack() {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="Chat" component={ChatScreen} />
+    </Stack.Navigator>
+  );
+}
+
+// Stack para los favoritos
+function FavoriteStack() {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="Favoritos" component={FavoriteAdsScreen} />
+    </Stack.Navigator>
+  );
+}
+
+export default function AppNavigator() {
+  return <OnboardingStack />;
 }

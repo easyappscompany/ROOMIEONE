@@ -258,7 +258,7 @@ const EditProfile = ({ navigation }) => {
 
       <TouchableOpacity
         style={styles.saveButton}
-        onPress={() => navigation.navigate("Home")}
+        onPress={() => navigation.navigate("Profile")}
       >
         <Icon name="save" size={24} color="#fff" />
       </TouchableOpacity>

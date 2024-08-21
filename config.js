@@ -3,12 +3,13 @@ import 'firebase/compat/auth';
 import 'firebase/compat/firestore';
 
 export const firebaseConfig = {
-    apiKey: "AIzaSyBF9GA1QPIZUTMkGZk-hbk6aKy1BRxTxY4",
-    authDomain: "roomieone-b59f4.firebaseapp.com",
-    projectId: "roomieone-b59f4",
-    storageBucket: "roomieone-b59f4.appspot.com",
-    messagingSenderId: "408276539312",
-    appId: "1:408276539312:web:d4c6a2787eed7780a62875"
+    apiKey: "AIzaSyDbtqh1BtuUo06tQ0DVRPDI7eeTuT29arU",
+    authDomain: "roomieone-d57eb.firebaseapp.com",
+    projectId: "roomieone-d57eb",
+    storageBucket: "roomieone-d57eb.appspot.com",
+    messagingSenderId: "680332616069",
+    appId: "1:680332616069:web:bbd695c6ab2678c69de4ec",
+    measurementId: "G-403NRVRVZ7"
 };
 
 // Inicializar Firebase solo si no está ya inicializado
