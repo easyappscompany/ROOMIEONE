@@ -16,7 +16,7 @@ const PhoneVerificationScreen = ({ navigation }) => {
         
         const phoneProvider = new firebase.auth.PhoneAuthProvider();
         phoneProvider
-            .verifyPhoneNumber(fullPhoneNumber, recaptchaVerifier.current)
+            .verifyPhoneNumber(fullPhoneNumber, recaptchaVerifier.current) 
             .then((verificationId) => {
                 setVerificationId(verificationId);
                 Alert.alert('Éxito', 'El código de verificación ha sido enviado.');

@@ -14,6 +14,7 @@ import Profile from "../screens/Profile";
 import EditProfile from "../screens/EditProfile";
 import PreferencesScreen from "../screens/PreferencesScreen";
 import Searches from "../screens/Searches"
+import StepNavigator from "../components/StepNavigator";
 
 const { width } = Dimensions.get("screen");
 
@@ -59,6 +60,7 @@ function HomeStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="Home" component={Home} />
+      <Stack.Screen name="StepNavigator" component={StepNavigator} /> 
       <Stack.Screen name="Chat" component={ChatScreen} />
       <Stack.Screen name="Favoritos" component={FavoriteAdsScreen} />
       <Stack.Screen name="Preferences" component={PreferencesScreen} />

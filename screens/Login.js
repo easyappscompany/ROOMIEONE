@@ -1,9 +1,11 @@
 import React, { useEffect } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, ImageBackground } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import * as Google from 'expo-auth-session/providers/google';
 import * as WebBrowser from 'expo-web-browser';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import firebase from '../config';
+import { getAuth, signInWithCredential, GoogleAuthProvider } from 'firebase/auth';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -18,11 +20,72 @@ const LoginScreen = () => {
   });
 
   useEffect(() => {
+    // Verificar si hay un token almacenado y redirigir al usuario
+    const checkUserToken = async () => {
+      const userToken = await AsyncStorage.getItem('userToken');
+      if (userToken) {
+        navigation.navigate('Home');
+      }
+    };
+
+    checkUserToken();
+  }, []);
+
+  useEffect(() => {
+    const registerUserInFirestore = async (userInfo) => {
+      try {
+        const userRef = firebase.firestore().collection('users').doc(userInfo.email);
+        const userDoc = await userRef.get();
+    
+        if (!userDoc.exists) {
+          await userRef.set({
+            name: userInfo.name,
+            email: userInfo.email,
+            photo: userInfo.picture,
+            additionalData: {} 
+          });
+        }
+      } catch (error) {
+        console.error('Error al registrar usuario en Firestore:', error);
+      }
+    };
+
+    const signInWithFirebase = async (idToken, accessToken) => {
+      const auth = getAuth();
+      const credential = GoogleAuthProvider.credential(idToken, accessToken);
+
+      try {
+        await signInWithCredential(auth, credential);
+        console.log('Usuario registrado en Firebase Authentication');
+      } catch (error) {
+        console.error('Error al iniciar sesión en Firebase Authentication:', error);
+      }
+    };
+
+    const fetchUserInfo = async (accessToken) => {
+      try {
+        const response = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+        const userInfo = await response.json();
+    
+        await registerUserInFirestore(userInfo);
+        await AsyncStorage.setItem('userName', userInfo.name);
+        await AsyncStorage.setItem('userPhoto', userInfo.picture);
+        await AsyncStorage.setItem('userEmail', userInfo.email); 
+        await AsyncStorage.setItem('userToken', accessToken);
+    
+        navigation.navigate('Home');
+      } catch (error) {
+        console.error('Error fetching user info:', error);
+      }
+    };
+
     if (response?.type === 'success') {
-      const { authentication } = response;
-      // Aquí puedes usar el token de acceso para autenticar al usuario en tu backend o Firebase
-      console.log('Auth token:', authentication.accessToken);
-       navigation.navigate('Home');
+      const { authentication, params } = response;
+      
+      signInWithFirebase(params.id_token, authentication.accessToken);
+      fetchUserInfo(authentication.accessToken);
     }
   }, [response]);
 
@@ -32,28 +95,16 @@ const LoginScreen = () => {
       style={styles.backgroundImage}
     >
       <View style={styles.container}>
-        {/* Selector de idioma */}
         <TouchableOpacity style={styles.languageButton}>
           <Text style={styles.languageText}>Español (ES)</Text>
         </TouchableOpacity>
 
-        {/* Logo y texto de bienvenida */}
         <View style={styles.logoContainer}>
           <Image source={require('../assets/imgs/logoroomieone.jpeg')} style={styles.logo} />
           <Text style={styles.subtitle}>Adapta tu hogar</Text>
           <Text style={styles.subtitle}> adapta tu vida.</Text>
         </View>
 
-        {/* Botón de continuar con número de teléfono */}
-        <TouchableOpacity 
-          style={styles.phoneButton}
-          onPress={() => navigation.navigate('PhoneVerification')}
-        >
-          <Ionicons name="call" size={20} color="white" />
-          <Text style={styles.phoneButtonText}>Continuar con número de teléfono</Text>
-        </TouchableOpacity>
-
-        {/* Botón de inicio de sesión con Google */}
         <TouchableOpacity 
           style={styles.googleButton}
           disabled={!request}
@@ -61,8 +112,8 @@ const LoginScreen = () => {
             promptAsync();
           }}
         >
-          <Ionicons name="logo-google" size={20} color="white" />
-          <Text style={styles.googleButtonText}>Continuar con Google</Text>
+          <Image source={require('../assets/imgs/google.png')} style={styles.googleIcon} />
+          <Text style={styles.googleButtonText}>Inicia sesión con Google.</Text>
         </TouchableOpacity>
       </View>
     </ImageBackground>
@@ -104,33 +155,35 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#004278',
   },
-  phoneButton: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#00000080',
-    padding: 15,
-    borderRadius: 10,
-  },
-  phoneButtonText: {
-    color: 'white',
-    marginLeft: 10,
-    fontSize: 16,
-  },
   googleButton: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#db4437',
-    padding: 15,
-    borderRadius: 10,
+    backgroundColor: 'white',
+    padding: 10,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: '#dddddd',
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.22,
+    shadowRadius: 2.22,
+    elevation: 3,
     marginTop: 10,
   },
+  googleIcon: {
+    width: 25,
+    height: 25,
+    marginRight: 10,
+  },
   googleButtonText: {
-    color: 'white',
-    marginLeft: 10,
+    color: '#3c4043',
     fontSize: 16,
   },
 });
 
 export default LoginScreen;
+

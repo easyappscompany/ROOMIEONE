@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -6,14 +6,17 @@ import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
+  Modal
 } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { useNavigation, useRoute } from "@react-navigation/native"; // Importar useRoute
 import { Ionicons } from "@expo/vector-icons"; // Importar Ionicons para el menú
+import StepNavigator from "../components/StepNavigator"; 
 
 export default function Home() {
   const navigation = useNavigation(); // Inicializar navigation
   const route = useRoute(); // Obtener la ruta actual
+  const [modalVisible, setModalVisible] = useState(false); 
 
   return (
     <View style={styles.container}>
@@ -138,9 +141,20 @@ export default function Home() {
         </View>
       </ScrollView>
 
-      <TouchableOpacity style={styles.publishButton}>
+      <TouchableOpacity
+        style={styles.publishButton}
+        onPress={() => setModalVisible(true)}
+      >
         <Text style={styles.publishButtonText}>Publica tu cuarto</Text>
       </TouchableOpacity>
+
+      <Modal
+        visible={modalVisible}
+        animationType="slide"
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <StepNavigator closeModal={() => setModalVisible(false)} />
+      </Modal>
 
       {/* Menú de navegación inferior */}
       <View style={styles.footer}>
