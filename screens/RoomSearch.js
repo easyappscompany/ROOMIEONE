@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -10,15 +10,37 @@ import {
   Modal,
 } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
-import { useNavigation, useRoute } from "@react-navigation/native"; // Importar useRoute
-import { Ionicons } from "@expo/vector-icons"; // Importar Ionicons para el menú
+import { useNavigation, useRoute } from "@react-navigation/native";
+import { Ionicons } from "@expo/vector-icons";
 import StepNavigator from "../components/StepNavigator";
+import { db } from "../config";
 
-export default function Home() {
-  const navigation = useNavigation(); // Inicializar navigation
-  const route = useRoute(); // Obtener la ruta actual
+export default function RoomSearch() {
+  const navigation = useNavigation();
+  const route = useRoute();
   const [modalVisible, setModalVisible] = useState(false);
-  const [searchText, setSearchText] = useState(""); // Estado para el texto del input
+  const [searchText, setSearchText] = useState("");
+  const [rooms, setRooms] = useState([]); // Estado para almacenar los cuartos obtenidos de Firestore
+  const [roomPhotos, setRoomPhotos] = useState({}); // Estado para almacenar las fotos de los cuartos
+
+  // Obtener cuartos de la colección 'rooms'
+  useEffect(() => {
+    const fetchRooms = async () => {
+        try {
+          const snapshot = await db.collection("rooms").get();
+          const roomList = snapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+          setRooms(roomList);
+        } catch (error) {
+          console.error("Error obteniendo cuartos:", error);
+        }
+      };
+  
+
+    fetchRooms();
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -30,7 +52,10 @@ export default function Home() {
             value={searchText}
             onChangeText={setSearchText}
           />
-          <TouchableOpacity style={styles.searchButton} onPress={() => navigation.navigate('RoomSearch')}>
+          <TouchableOpacity
+            style={styles.searchButton}
+            onPress={() => navigation.navigate("RoomSearch")}
+          >
             <Icon name="search" size={20} color="#fff" />
           </TouchableOpacity>
         </View>
@@ -61,97 +86,21 @@ export default function Home() {
           </TouchableOpacity>
         </View>
         <Text style={styles.sectionTitle}>Busca en</Text>
-        {/* Lista de ciudades */}
-        <View style={styles.imageContainer}>
-          <Image
-            style={styles.cityImage}
-            source={{
-              uri: "https://www.mexicodesconocido.com.mx/wp-content/uploads/2019/04/41525992451_953f7e233b_o.jpg",
-            }}
-          />
-          <Text style={styles.cityText}>CDMX</Text>
-        </View>
-        <View style={styles.imageContainer}>
-          <Image
-            style={styles.cityImage}
-            source={{
-              uri: "https://images.pexels.com/photos/543252/pexels-photo-543252.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-            }}
-          />
-          <Text style={styles.cityText}>GUADALAJARA</Text>
-        </View>
-        <View style={styles.imageContainer}>
-          <Image
-            style={styles.cityImage}
-            source={{
-              uri: "https://www.shutterstock.com/shutterstock/videos/1084043488/thumb/1.jpg?ip=x480",
-            }}
-          />
-          <Text style={styles.cityText}>MONTERREY</Text>
-        </View>
-        <View style={styles.imageContainer}>
-          <Image
-            style={styles.cityImage}
-            source={{
-              uri: "https://media.istockphoto.com/id/1128095909/es/foto/fuente-hist%C3%B3rica-puebla.jpg?s=612x612&w=0&k=20&c=Ql0wQCPqNW3Xzkc7Krw9gRspO3KeNKeFFOthMMgqgWg=",
-            }}
-          />
-          <Text style={styles.cityText}>PUEBLA</Text>
-        </View>
-        <View style={styles.imageContainer}>
-          <Image
-            style={styles.cityImage}
-            source={{
-              uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRt7fRUC_L5wVKN19-f3-RLNiUEQ8lCveULXQ&s",
-            }}
-          />
-          <Text style={styles.cityText}>BOCA DEL RIO</Text>
-        </View>
-        <View style={styles.imageContainer}>
-          <Image
-            style={styles.cityImage}
-            source={{
-              uri: "https://nitu.mx/wp-content/uploads/2020/09/Puerto-Vallarta_.jpg",
-            }}
-          />
-          <Text style={styles.cityText}>PUERTO VALLARTA</Text>
-        </View>
-        <View style={styles.imageContainer}>
-          <Image
-            style={styles.cityImage}
-            source={{
-              uri: "https://www.revistatravel.mx/images/showid/5818278",
-            }}
-          />
-          <Text style={styles.cityText}>TIJUANA</Text>
-        </View>
-        <View style={styles.imageContainer}>
-          <Image
-            style={styles.cityImage}
-            source={{
-              uri: "https://st3.depositphotos.com/4651905/18986/i/950/depositphotos_189865962-stock-illustration-cancun-mexico-inscription-in-front.jpg",
-            }}
-          />
-          <Text style={styles.cityText}>CANCÚN</Text>
-        </View>
-        <View style={styles.imageContainer}>
-          <Image
-            style={styles.cityImage}
-            source={{
-              uri: "https://res.cloudinary.com/simpleview/image/upload/v1672768705/clients/loscabosmx/The_Arch_3_3__5e43fe14-83a8-41e3-9189-e54dc5c75c95.jpg",
-            }}
-          />
-          <Text style={styles.cityText}>LOS CABOS</Text>
-        </View>
-        <View style={styles.imageContainer}>
-          <Image
-            style={styles.cityImage}
-            source={{
-              uri: "https://media.admagazine.com/photos/618a6737a9f7fab6f0622ef6/16:9/w_2992,h_1683,c_limit/66143.jpg",
-            }}
-          />
-          <Text style={styles.cityText}>OAXACA</Text>
-        </View>
+        {rooms.map((room) => (
+          <View key={room.id} style={styles.roomContainer}>
+            <Image
+              style={styles.roomImage}
+              source={{
+                uri: room.imageUrls ? room.imageUrls[0] : "https://via.placeholder.com/150",
+              }}
+            />
+            <View style={styles.textOverlay}>
+              <Text style={styles.roomTitle}>{room.title}</Text>
+              <Text style={styles.roomPrice}>${room.monthlyRent}/mes</Text>
+              <Text style={styles.roomCountry}>{room.country}</Text>
+            </View>
+          </View>
+        ))}
       </ScrollView>
 
       <TouchableOpacity
@@ -353,5 +302,43 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginLeft: -5,
     marginTop: 4,
+  },
+  roomContainer: {
+    marginBottom: 16,
+    position: "relative",
+    borderRadius: 8,
+    overflow: "hidden",
+  },
+  roomImage: {
+    width: "100%",
+    height: 200,
+    borderRadius: 8,
+  },
+  roomInfo: {
+    padding: 10,
+    backgroundColor: "#fff",
+  },
+  textOverlay: {
+    position: "absolute", // Coloca el texto encima de la imagen
+    bottom: 0, // Posiciona el texto en la parte inferior
+    left: 0,
+    right: 0,
+    backgroundColor: "rgba(0, 0, 0, 0.8)", // Fondo semitransparente
+    padding: 10,
+  },
+  roomTitle: {
+    color: "#00c06b",
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 4,
+  },
+  roomPrice: {
+    fontSize: 16,
+    color: "#00c06b",
+    marginBottom: 4,
+  },
+  roomCountry: {
+    fontSize: 14,
+    color: "rgba(255, 255, 255, 0.8)",
   },
 });

@@ -15,6 +15,7 @@ import EditProfile from "../screens/EditProfile";
 import PreferencesScreen from "../screens/PreferencesScreen";
 import Searches from "../screens/Searches"
 import StepNavigator from "../components/StepNavigator";
+import RoomSearch from "../screens/RoomSearch";
 
 const { width } = Dimensions.get("screen");
 
@@ -65,6 +66,7 @@ function HomeStack() {
       <Stack.Screen name="Favoritos" component={FavoriteAdsScreen} />
       <Stack.Screen name="Preferences" component={PreferencesScreen} />
       <Stack.Screen name="Searches" component={Searches} />
+      <Stack.Screen name="RoomSearch" component={RoomSearch} />
     </Stack.Navigator>
   );
 }

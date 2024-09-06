@@ -16,6 +16,7 @@ import { getFirestore, collection, addDoc } from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { getAuth } from "firebase/auth";
 import { getCountries, getStates, getCities } from "../apiService";
+import { db, auth, storage } from "../config";
 
 const Step1Multimedia = ({ handleSubmit }) => {
   const [images, setImages] = useState([]);
@@ -160,8 +161,9 @@ const Step1Multimedia = ({ handleSubmit }) => {
       alert("Debes subir al menos una foto.");
       return;
     }
-
+  
     try {
+      // Subir las imágenes y obtener sus URLs
       const imageUrls = await Promise.all(
         images.map(async (image) => {
           if (image.uri) {
@@ -171,10 +173,11 @@ const Step1Multimedia = ({ handleSubmit }) => {
           }
         })
       );
-
+  
       const user = auth.currentUser;
       const userEmail = user?.email;
-
+  
+      // Crear el objeto roomData con los datos del cuarto y las URLs de las imágenes
       const roomData = {
         title,
         description,
@@ -186,22 +189,16 @@ const Step1Multimedia = ({ handleSubmit }) => {
         houseNumber,
         depositRequired,
         userEmail,
+        imageUrls, // Agregar las URLs de las imágenes aquí
       };
+  
+      // Guardar el objeto roomData en la colección 'rooms'
       const roomDocRef = await addDoc(collection(db, "rooms"), roomData);
       console.log("Documento de cuarto escrito con ID: ", roomDocRef.id);
-
-      const photosData = {
-        roomId: roomDocRef.id,
-        imageUrls,
-      };
-      const photosDocRef = await addDoc(
-        collection(db, "room_photos"),
-        photosData
-      );
-      console.log("Documento de fotos escrito con ID: ", photosDocRef.id);
-
+  
       handleSubmit(roomData);
-
+  
+      // Navegar de vuelta a Home
       navigation.dispatch(
         CommonActions.reset({
           index: 0,
