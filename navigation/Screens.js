@@ -2,6 +2,7 @@ import React from "react";
 import { Dimensions } from "react-native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createDrawerNavigator } from "@react-navigation/drawer";
+import CustomDrawerContent from '../navigation/Menu';
 
 // Importar las pantallas necesarias
 import Onboarding from "../screens/Onboarding";
@@ -16,6 +17,9 @@ import PreferencesScreen from "../screens/PreferencesScreen";
 import Searches from "../screens/Searches"
 import StepNavigator from "../components/StepNavigator";
 import RoomSearch from "../screens/RoomSearch";
+import MyRooms from "../screens/MyRooms";
+import EditRoom from "../screens/EditRoom";
+import RoomDetails from "../screens/RoomDetails";
 
 const { width } = Dimensions.get("screen");
 
@@ -38,6 +42,7 @@ function OnboardingStack() {
 function HomeDrawerStack() {
   return (
     <Drawer.Navigator
+      drawerContent={(props) => <CustomDrawerContent {...props} />} // Agrega esta línea para usar tu CustomDrawerContent
       drawerContentOptions={{
         activeTintColor: "white",
         inactiveTintColor: "#000",
@@ -47,11 +52,11 @@ function HomeDrawerStack() {
       drawerStyle={{ width: width * 0.8 }}
       initialRouteName="Home"
     >
-      <Drawer.Screen name="Home" component={HomeStack} />
+      <Drawer.Screen name="Inicio" component={HomeStack} />
       <Drawer.Screen name="Chat" component={ChatStack} />
       <Drawer.Screen name="Favoritos" component={FavoriteStack} />
-      <Drawer.Screen name="Profile" component={ProfileStack} />
-      <Drawer.Screen name="Preferences" component={PreferencesScreen} />
+      <Drawer.Screen name="Perfil" component={ProfileStack} />
+      <Drawer.Screen name="Mis Cuartos Publicados" component={MyRooms} />
     </Drawer.Navigator>
   );
 }
@@ -67,6 +72,8 @@ function HomeStack() {
       <Stack.Screen name="Preferences" component={PreferencesScreen} />
       <Stack.Screen name="Searches" component={Searches} />
       <Stack.Screen name="RoomSearch" component={RoomSearch} />
+      <Stack.Screen name="EditRoom" component={EditRoom} />
+      <Stack.Screen name="RoomDetails" component={RoomDetails} />
     </Stack.Navigator>
   );
 }

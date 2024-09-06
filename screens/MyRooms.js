@@ -14,25 +14,36 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import StepNavigator from "../components/StepNavigator";
 import { db } from "../config";
+import { getAuth } from "firebase/auth"; // Importa Firebase Auth para obtener el usuario autenticado
 
-export default function RoomSearch() {
+export default function MyRooms() {
   const navigation = useNavigation();
   const route = useRoute();
   const [modalVisible, setModalVisible] = useState(false);
-  const [searchText, setSearchText] = useState("");
   const [rooms, setRooms] = useState([]); // Estado para almacenar los cuartos obtenidos de Firestore
-  const [roomPhotos, setRoomPhotos] = useState({}); // Estado para almacenar las fotos de los cuartos
 
-  // Obtener cuartos de la colección 'rooms'
+  // Obtener cuartos de la colección 'rooms' filtrados por el usuario autenticado
   useEffect(() => {
     const fetchRooms = async () => {
       try {
-        const snapshot = await db.collection("rooms").get();
-        const roomList = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setRooms(roomList);
+        const auth = getAuth(); // Inicializa Firebase Auth
+        const user = auth.currentUser; // Obtén el usuario autenticado
+
+        if (user) {
+          const userEmail = user.email; // Obtén el correo del usuario autenticado
+          const snapshot = await db
+            .collection("rooms")
+            .where("userEmail", "==", userEmail)
+            .get(); // Filtra por correo
+
+          const roomList = snapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+          setRooms(roomList);
+        } else {
+          console.log("No hay usuario autenticado.");
+        }
       } catch (error) {
         console.error("Error obteniendo cuartos:", error);
       }
@@ -44,75 +55,36 @@ export default function RoomSearch() {
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
-        <View style={styles.searchContainer}>
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Busca tu habitación..."
-            value={searchText}
-            onChangeText={setSearchText}
-          />
-          <TouchableOpacity
-            style={styles.searchButton}
-            onPress={() => navigation.navigate("RoomSearch")}
-          >
-            <Icon name="search" size={20} color="#fff" />
-          </TouchableOpacity>
-        </View>
-        <View style={styles.buttonRow}>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => navigation.navigate("Searches")}
-          >
-            <Icon
-              name="bookmark"
-              size={16}
-              color="#000"
-              style={styles.buttonIcon}
-            />
-            <Text style={styles.buttonText}>Búsquedas guardadas</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => navigation.navigate("Preferences")}
-          >
-            <Icon
-              name="sliders"
-              size={20}
-              color="#000"
-              style={styles.buttonIcon}
-            />
-            <Text style={styles.buttonText}>Preferencias de búsqueda</Text>
-          </TouchableOpacity>
-        </View>
-        <Text style={styles.sectionTitle}>Busca en</Text>
+        <View style={styles.buttonRow}></View>
+        <Text style={styles.sectionTitle}>Mis Cuartos</Text>
         {rooms.map((room) => (
-          <TouchableOpacity
-            key={room.id}
-            style={styles.roomContainer}
-            onPress={() => navigation.navigate("RoomDetails", { room })}
-          >
-            <Image
-              style={styles.roomImage}
-              source={{
-                uri: room.imageUrls
-                  ? room.imageUrls[0]
-                  : "https://via.placeholder.com/150",
-              }}
-            />
-            <View style={styles.textOverlay}>
-              <Text style={styles.roomTitle}>{room.title}</Text>
-              <Text style={styles.roomPrice}>${room.monthlyRent}/mes</Text>
-              <Text style={styles.roomCountry}>{room.country}</Text>
-            </View>
-          </TouchableOpacity>
-        ))}
+  <TouchableOpacity
+    key={room.id}
+    style={styles.roomContainer}
+    onPress={() => navigation.navigate("EditRoom", { roomId: room.id })}
+  >
+    <Image
+      style={styles.roomImage}
+      source={{
+        uri: room.imageUrls
+          ? room.imageUrls[0]
+          : "https://via.placeholder.com/150",
+      }}
+    />
+    <View style={styles.textOverlay}>
+      <Text style={styles.roomTitle}>{room.title}</Text>
+      <Text style={styles.roomPrice}>${room.monthlyRent}/mes</Text>
+      <Text style={styles.roomCountry}>{room.country}</Text>
+    </View>
+  </TouchableOpacity>
+))}
       </ScrollView>
 
       <TouchableOpacity
         style={styles.publishButton}
         onPress={() => setModalVisible(true)}
       >
-        <Text style={styles.publishButtonText}>Publica tu cuarto</Text>
+        <Ionicons name="add-outline" size={30} color="#fff" />
       </TouchableOpacity>
 
       <Modal
@@ -277,13 +249,16 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   publishButton: {
-    backgroundColor: "#00c06b",
-    paddingVertical: 14,
-    borderRadius: 20,
     position: "absolute",
-    bottom: 80, // Para que esté por encima del menú
-    left: 16,
-    right: 16,
+    bottom: 80,
+    right: 20,
+    width: 60,
+    height: 60,
+    backgroundColor: "#00c06b",
+    borderRadius: 30,
+    justifyContent: "center",
+    alignItems: "center",
+    elevation: 5,
   },
   publishButtonText: {
     color: "#fff",
