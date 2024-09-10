@@ -76,7 +76,7 @@ const FavoriteAdsScreen = () => {
       />
 
       <View style={styles.footer}>
-        <TouchableOpacity onPress={() => navigation.navigate("Home")}>
+        <TouchableOpacity onPress={() => navigation.navigate("Inicio")}>
           <Ionicons
             name="home-outline"
             size={24}

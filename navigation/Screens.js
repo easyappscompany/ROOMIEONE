@@ -20,6 +20,7 @@ import RoomSearch from "../screens/RoomSearch";
 import MyRooms from "../screens/MyRooms";
 import EditRoom from "../screens/EditRoom";
 import RoomDetails from "../screens/RoomDetails";
+import MyRoomDetails from "../screens/MyRoomDetails";
 
 const { width } = Dimensions.get("screen");
 
@@ -52,7 +53,7 @@ function HomeDrawerStack() {
       drawerStyle={{ width: width * 0.8 }}
       initialRouteName="Home"
     >
-      <Drawer.Screen name="Inicio" component={HomeStack} />
+      <Drawer.Screen name="Inicio" component={HomeStack}  />
       <Drawer.Screen name="Chat" component={ChatStack} />
       <Drawer.Screen name="Favoritos" component={FavoriteStack} />
       <Drawer.Screen name="Perfil" component={ProfileStack} />
@@ -65,15 +66,17 @@ function HomeDrawerStack() {
 function HomeStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="Home" component={Home} />
+      <Stack.Screen name="Inicio" component={Home} />
       <Stack.Screen name="StepNavigator" component={StepNavigator} /> 
       <Stack.Screen name="Chat" component={ChatScreen} />
       <Stack.Screen name="Favoritos" component={FavoriteAdsScreen} />
       <Stack.Screen name="Preferences" component={PreferencesScreen} />
       <Stack.Screen name="Searches" component={Searches} />
       <Stack.Screen name="RoomSearch" component={RoomSearch} />
+      <Stack.Screen name="MyRoomDetails" component={MyRoomDetails} />
       <Stack.Screen name="EditRoom" component={EditRoom} />
       <Stack.Screen name="RoomDetails" component={RoomDetails} />
+      <Stack.Screen name="MyRooms" component={MyRooms} />
     </Stack.Navigator>
   );
 }

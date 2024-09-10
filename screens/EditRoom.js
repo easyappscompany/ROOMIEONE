@@ -85,11 +85,13 @@ const EditRoomScreen = ({ route }) => {
       if (country) {
         try {
           const fetchedStates = await getStates(country);
-          setStates(fetchedStates);
-          setState(""); // Restablecer el estado cuando se selecciona un nuevo país
-          setCity(""); // Restablecer la ciudad cuando se selecciona un nuevo país
+          if (Array.isArray(fetchedStates)) {
+            setStates(fetchedStates);
+          } else {
+            console.error("Fetched states is not an array:", fetchedStates);
+          }
         } catch (error) {
-          console.error(`Error al obtener los estados de ${country}:`, error);
+          console.error(`Error fetching states for country ${country}:`, error);
         }
       }
     };
@@ -99,21 +101,31 @@ const EditRoomScreen = ({ route }) => {
 
   useEffect(() => {
     const fetchCities = async () => {
-      if (country && state) {
-        try {
-          const fetchedCities = await getCities(country, state);
-          if (Array.isArray(fetchedCities)) {
-            setCities(fetchedCities);
-          } else {
-            console.error("Fetched cities is not an array:", fetchedCities);
-          }
-        } catch (error) {
-          console.error("Error fetching cities:", error);
+      if (!country || !state) {
+        console.warn("Country or state is empty, skipping fetch cities.");
+        return;
+      }
+  
+      try {
+        const fetchedCities = await getCities(country, state);
+  
+        // Añadir validación adicional
+        if (!fetchedCities || !Array.isArray(fetchedCities)) {
+          console.error("Fetched cities is not an array or is undefined:", fetchedCities);
+          setCities([]); // Set cities to empty array to avoid lingering data
+          return;
         }
+  
+        setCities(fetchedCities);
+      } catch (error) {
+        console.error("Error fetching cities:", error);
       }
     };
-
-    fetchCities();
+  
+    // Llama a la función solo si country y state están definidos
+    if (country && state) {
+      fetchCities();
+    }
   }, [country, state]);
 
   const pickImage = async () => {
@@ -192,18 +204,18 @@ const EditRoomScreen = ({ route }) => {
         monthlyRent: monthlyRent || "",
         depositRequired: depositRequired || false,
       };
-  
+
       // Elimina cualquier campo con valor vacío o undefined
       Object.keys(roomData).forEach((key) => {
         if (roomData[key] === undefined || roomData[key] === "") {
           delete roomData[key];
         }
       });
-  
+
       // Actualizar el documento en Firestore
       await updateDoc(doc(db, "rooms", roomId), roomData);
       console.log("Documento actualizado exitosamente");
-  
+
       // Navegar a la pantalla MyRooms después de guardar
       navigation.dispatch(
         CommonActions.reset({
@@ -307,7 +319,7 @@ const EditRoomScreen = ({ route }) => {
         >
           <Picker.Item label="Seleccione estado" value="" />
           {states.map((state, index) => (
-            <Picker.Item key={index} label={state.name} value={state.code} />
+            <Picker.Item key={index} label={state.name} value={state.iso2} />
           ))}
         </Picker>
       </View>

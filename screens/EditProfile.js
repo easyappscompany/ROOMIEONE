@@ -110,7 +110,6 @@ const EditProfile = ({ navigation }) => {
       if (country) {
         try {
           const fetchedStates = await getStates(country);
-          console.log("Fetched states:", fetchedStates);
           if (Array.isArray(fetchedStates)) {
             setStates(fetchedStates);
           } else {
@@ -127,23 +126,31 @@ const EditProfile = ({ navigation }) => {
 
   useEffect(() => {
     const fetchCities = async () => {
-      if (country && state) {
-        try {
-          const fetchedCities = await getCities(country, state);
-          if (Array.isArray(fetchedCities)) {
-            setCities(fetchedCities);
-          } else {
-            console.error("Fetched cities is not an array:", fetchedCities);
-          }
-        } catch (error) {
-          console.error("Error fetching cities:", error);
-        }
-      } else {
+      if (!country || !state) {
         console.warn("Country or state is empty, skipping fetch cities.");
+        return;
+      }
+  
+      try {
+        const fetchedCities = await getCities(country, state);
+  
+        // Añadir validación adicional
+        if (!fetchedCities || !Array.isArray(fetchedCities)) {
+          console.error("Fetched cities is not an array or is undefined:", fetchedCities);
+          setCities([]); // Set cities to empty array to avoid lingering data
+          return;
+        }
+  
+        setCities(fetchedCities);
+      } catch (error) {
+        console.error("Error fetching cities:", error);
       }
     };
-
-    fetchCities();
+  
+    // Llama a la función solo si country y state están definidos
+    if (country && state) {
+      fetchCities();
+    }
   }, [country, state]);
 
   const pickImage = async () => {
@@ -185,18 +192,21 @@ const EditProfile = ({ navigation }) => {
       alert("Por favor, introduce información válida.");
       return;
     }
-
+  
     try {
       const auth = getAuth();
       const db = getFirestore();
       const user = auth.currentUser;
-
+  
       if (user) {
         const userEmail = user.email.trim().toLowerCase();
         const userDocRef = doc(db, "users", userEmail);
-
+  
+        // Crear una copia de las URLs de las fotos (puedes modificarlas aquí si es necesario)
+        const photosURL = photos;
+  
         await setDoc(userDocRef, {
-          photoURL: photos[0] || user.photoURL,
+          photoURL: photos[0] || user.photoURL, // URL de la primera foto como principal
           email: userEmail,
           dob: birthDate,
           gender: gender,
@@ -209,9 +219,10 @@ const EditProfile = ({ navigation }) => {
           interiorNumber: interiorNumber,
           exteriorNumber: exteriorNumber,
           postalCode: postalCode,
-          photos: photos,
+          photos: photos, // Almacena las fotos en el array `photos`
+          photosURL: photosURL, // Almacena las URLs de las fotos en `photosURL`
         });
-
+  
         console.log("Datos de perfil guardados exitosamente.");
         alert("Perfil guardado correctamente.");
         navigation.navigate("Profile");
@@ -382,7 +393,7 @@ const EditProfile = ({ navigation }) => {
         </View>
 
         <View style={styles.inputContainer}>
-          <Icon name="doorbell" size={20} color="#666" style={styles.inputIcon} />
+          <Icon name="house" size={20} color="#666" style={styles.inputIcon} />
           <TextInput
             style={styles.input}
             placeholder="Número interior"

@@ -23,15 +23,18 @@ const Profile = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const [userName, setUserName] = useState("Cargando...");
-  const [userPhoto, setUserPhoto] = useState("file:///data/user/0/host.exp.exponent/cache/ExperienceData/%2540easyappscompany%252Fargon-free-react-native/ImagePicker/705a9012-6f59-4b06-b089-1c71e95a2050.jpeg"
-);
+  const [userPhotos, setUserPhotos] = useState([
+    "ruta/predeterminada/de/avatar.jpeg",
+  ]);
   const [userEmail, setUserEmail] = useState("Cargando...");
   const [modalVisible, setModalVisible] = useState(false);
   const scaleValue = useRef(new Animated.Value(0)).current;
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const scrollViewRef = useRef(null);
 
   // Nuevos estados
   const [dob, setDob] = useState("");
-  const [gender, setGender] = useState(""); 
+  const [gender, setGender] = useState("");
   const [ine, setIne] = useState("");
   const [rfc, setRfc] = useState("");
   const [country, setCountry] = useState("");
@@ -50,7 +53,6 @@ const Profile = () => {
 
         if (user) {
           setUserName(user.displayName || "Nombre no disponible");
-          setUserPhoto(user.photos || "file:///data/user/0/host.exp.exponent/cache/ExperienceData/%2540easyappscompany%252Fargon-free-react-native/ImagePicker/7589d2d2-92d0-4daf-a697-e5bc678d17e1.jpeg");
           setUserEmail(user.email || "Email no disponible");
 
           const db = getFirestore();
@@ -59,6 +61,13 @@ const Profile = () => {
 
           if (userSnap.exists()) {
             const userData = userSnap.data();
+
+            // Actualiza el estado con todas las fotos si existen, si no, usa una predeterminada
+            const photoURLs =
+              userData.photosURL?.length > 0
+                ? userData.photosURL
+                : ["ruta/predeterminada/de/avatar.jpeg"];
+            setUserPhotos(photoURLs);
 
             const dobTimestamp = userData.dob;
             if (dobTimestamp && dobTimestamp.seconds) {
@@ -112,6 +121,34 @@ const Profile = () => {
     });
   };
 
+  const handleScroll = (event) => {
+    const contentOffsetX = event.nativeEvent.contentOffset.x;
+    const currentIndex = Math.floor(contentOffsetX / width);
+    setCurrentIndex(currentIndex);
+  };
+
+  const handlePrev = () => {
+    if (scrollViewRef.current && currentIndex > 0) {
+      scrollViewRef.current.scrollTo({
+        x: (currentIndex - 1) * width,
+        animated: true,
+      });
+    }
+  };
+
+  const handleNext = () => {
+    if (scrollViewRef.current && currentIndex < userPhotos.length - 1) {
+      scrollViewRef.current.scrollTo({
+        x: (currentIndex + 1) * width,
+        animated: true,
+      });
+    }
+  };
+
+  useEffect(() => {
+    console.log("userPhotos:", userPhotos);
+  }, [userPhotos]);
+
   return (
     <Block flex style={styles.profile}>
       <Block flex>
@@ -119,10 +156,7 @@ const Profile = () => {
           <Block flex style={styles.profileCard}>
             <Block middle style={styles.avatarContainer}>
               <TouchableOpacity onPress={handleImagePress}>
-                <Image
-                  source={{ uri: userPhoto }}
-                  style={styles.avatar}
-                />
+                <Image source={{ uri: userPhotos[0] }} style={styles.avatar} />
               </TouchableOpacity>
             </Block>
             <Block middle style={styles.nameInfo}>
@@ -153,7 +187,7 @@ const Profile = () => {
 
             <Block style={styles.section}>
               <Text style={styles.sectionTitle}>Género</Text>
-              <Text style={styles.sectionText}>{gender}</Text> 
+              <Text style={styles.sectionText}>{gender}</Text>
             </Block>
 
             <Block style={styles.section}>
@@ -219,23 +253,69 @@ const Profile = () => {
         onRequestClose={handleCloseModal}
       >
         <View style={styles.modalBackground}>
-          <TouchableOpacity onPress={handleCloseModal}>
-            <Animated.Image
-              source={{ uri: userPhoto }}
-              style={[
-                styles.modalImage,
-                {
-                  transform: [{ scale: scaleValue }],
-                },
-              ]}
-              resizeMode="contain"
-            />
-          </TouchableOpacity>
+          <Animated.View
+            style={[
+              styles.modalContainer,
+              {
+                transform: [{ scale: scaleValue }],
+              },
+            ]}
+          >
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={handleCloseModal}
+            >
+              <Ionicons name="close-circle" size={30} color="white" />
+            </TouchableOpacity>
+
+            <ScrollView
+              horizontal
+              pagingEnabled
+              showsHorizontalScrollIndicator={false}
+              ref={scrollViewRef}
+              onScroll={handleScroll}
+              scrollEventThrottle={16}
+            >
+              {userPhotos.map((photo, index) => (
+                <Image
+                  key={index}
+                  source={{ uri: photo }}
+                  style={styles.modalImage}
+                  resizeMode="contain"
+                />
+              ))}
+            </ScrollView>
+
+            <View style={styles.navigationButtons}>
+              <TouchableOpacity style={styles.prevButton} onPress={handlePrev}>
+                <Ionicons name="chevron-back-circle" size={40} color="white" />
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
+                <Ionicons
+                  name="chevron-forward-circle"
+                  size={40}
+                  color="white"
+                />
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.indicatorContainer}>
+              {userPhotos.map((_, index) => (
+                <View
+                  key={index}
+                  style={[
+                    styles.indicator,
+                    currentIndex === index && { backgroundColor: "#00c06b" },
+                  ]}
+                />
+              ))}
+            </View>
+          </Animated.View>
         </View>
       </Modal>
 
       <View style={styles.footer}>
-        <TouchableOpacity onPress={() => navigation.navigate("Home")}>
+        <TouchableOpacity onPress={() => navigation.navigate("Inicio")}>
           <Ionicons
             name="home-outline"
             size={24}
@@ -254,12 +334,12 @@ const Profile = () => {
           <Ionicons
             name="heart-outline"
             size={24}
-            color={route.name === "Favoritos" ? "#00c06b" : "black"}
+            color={route.name === "Fav" ? "#00c06b" : "black"}
           />
           <Text
             style={[
               styles.footerText,
-              { color: route.name === "Favoritos" ? "#00c06b" : "black" },
+              { color: route.name === "Fav" ? "#00c06b" : "black" },
             ]}
           >
             Favoritos
@@ -280,7 +360,7 @@ const Profile = () => {
             Chat
           </Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate("Profile")}>
+        <TouchableOpacity onPress={() => navigation.navigate("Perfil")}>
           <Ionicons
             name="person-outline"
             size={24}
@@ -384,6 +464,14 @@ const styles = StyleSheet.create({
     height: width * 0.8,
     borderRadius: 10,
   },
+  modalContainer: {
+    width: width - 40,
+    height: width - 40,
+    backgroundColor: "rgba(0,0,0,0.2)",
+    borderRadius: 10,
+    justifyContent: "center",
+    alignItems: "center",
+  },
   footer: {
     flexDirection: "row",
     justifyContent: "space-around",
@@ -395,6 +483,40 @@ const styles = StyleSheet.create({
   footerText: {
     fontSize: 12,
     textAlign: "center",
+  },
+  indicatorContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginVertical: 10,
+  },
+  indicator: {
+    height: 8,
+    width: 8,
+    backgroundColor: "#000",
+    borderRadius: 4,
+    marginHorizontal: 4,
+  },
+  navigationButtons: {
+    position: "absolute",
+    top: "50%",
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+
+  prevButton: {
+    position: "absolute",
+    left: 20,
+  },
+  nextButton: {
+    position: "absolute",
+    right: 20,
+  },
+  closeButton: {
+    position: "absolute",
+    top: 10,
+    right: 10,
+    zIndex: 1,
   },
 });
 

@@ -171,7 +171,7 @@ export default function Home() {
 
       {/* Menú de navegación inferior */}
       <View style={styles.footer}>
-        <TouchableOpacity onPress={() => navigation.navigate("Home")}>
+        <TouchableOpacity onPress={() => navigation.navigate("Inicio")}>
           <Ionicons
             name="home-outline"
             size={24}
@@ -216,7 +216,7 @@ export default function Home() {
             Chat
           </Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate("Profile")}>
+        <TouchableOpacity onPress={() => navigation.navigate("Perfil")}>
           <Ionicons
             name="person-outline"
             size={24}
