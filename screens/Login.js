@@ -19,19 +19,25 @@ const LoginScreen = () => {
     webClientId: '680332616069-3tl0kanaf4cq6f2lf8mhkp68ci8npa87.apps.googleusercontent.com',
   });
 
+  // Verificar el estado de autenticación al iniciar la app
   useEffect(() => {
-    // Verificar si hay un token almacenado y redirigir al usuario
-    const checkUserToken = async () => {
-      const userToken = await AsyncStorage.getItem('userToken');
-      if (userToken) {
-        navigation.navigate('Home');
-      }
-    };
+    const auth = getAuth();
 
-    checkUserToken();
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        // Usuario autenticado, redirigir a Inicio
+        navigation.navigate('Home');
+      } else {
+        // Usuario no autenticado, mantener en Login
+        console.log('No hay usuario autenticado');
+      }
+    });
+
+    return () => unsubscribe(); // Limpieza del listener
   }, []);
 
   useEffect(() => {
+    // Registrar el usuario en Firestore si es necesario
     const registerUserInFirestore = async (userInfo) => {
       try {
         const userRef = firebase.firestore().collection('users').doc(userInfo.email);
@@ -186,4 +192,3 @@ const styles = StyleSheet.create({
 });
 
 export default LoginScreen;
-

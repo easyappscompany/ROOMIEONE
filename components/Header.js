@@ -51,6 +51,9 @@ class Header extends React.Component {
 }
 
 const styles = StyleSheet.create({
+  headerStyles:{
+    marginTop: 200,
+  },
   navbar: {
     paddingVertical: 0,
     paddingBottom: theme.SIZES.BASE * 1.5,

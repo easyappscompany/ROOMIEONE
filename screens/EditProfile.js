@@ -188,8 +188,51 @@ const EditProfile = ({ navigation }) => {
   };
 
   const saveProfile = async () => {
-    if (!validarRFC(rfc) || !validarClaveElector(claveElector)) {
-      alert("Por favor, introduce información válida.");
+    // Validar si todos los campos obligatorios tienen un valor
+    if (!photos.length) {
+      alert("Por favor, sube al menos una foto.");
+      return;
+    }
+    if (!country) {
+      alert("Por favor, selecciona un país.");
+      return;
+    }
+    if (!state) {
+      alert("Por favor, selecciona un estado.");
+      return;
+    }
+    if (!city) {
+      alert("Por favor, selecciona una ciudad.");
+      return;
+    }
+    if (!formattedDate) {
+      alert("Por favor, selecciona tu fecha de nacimiento.");
+      return;
+    }
+    if (!gender) {
+      alert("Por favor, selecciona tu género.");
+      return;
+    }
+    if (!claveElector || !validarClaveElector(claveElector)) {
+      alert("Por favor, introduce una Clave de Elector válida.");
+      return;
+    }
+    if (!street) {
+      alert("Por favor, introduce la calle.");
+      return;
+    }
+    if (!exteriorNumber) {
+      alert("Por favor, introduce el número exterior.");
+      return;
+    }
+    if (!postalCode) {
+      alert("Por favor, introduce el código postal.");
+      return;
+    }
+  
+    // Si se ingresó un RFC, validar su formato
+    if (rfc && !validarRFC(rfc)) {
+      alert("Por favor, introduce un RFC válido.");
       return;
     }
   
@@ -202,7 +245,6 @@ const EditProfile = ({ navigation }) => {
         const userEmail = user.email.trim().toLowerCase();
         const userDocRef = doc(db, "users", userEmail);
   
-        // Crear una copia de las URLs de las fotos (puedes modificarlas aquí si es necesario)
         const photosURL = photos;
   
         await setDoc(userDocRef, {
@@ -211,7 +253,7 @@ const EditProfile = ({ navigation }) => {
           dob: birthDate,
           gender: gender,
           ine: claveElector,
-          rfc: rfc,
+          rfc: rfc || null, // Guardar RFC solo si fue ingresado
           country: country,
           state: state,
           city: city,
@@ -219,8 +261,8 @@ const EditProfile = ({ navigation }) => {
           interiorNumber: interiorNumber,
           exteriorNumber: exteriorNumber,
           postalCode: postalCode,
-          photos: photos, // Almacena las fotos en el array `photos`
-          photosURL: photosURL, // Almacena las URLs de las fotos en `photosURL`
+          photos: photos,
+          photosURL: photosURL,
         });
   
         console.log("Datos de perfil guardados exitosamente.");
@@ -236,6 +278,7 @@ const EditProfile = ({ navigation }) => {
       alert("Hubo un error al guardar el perfil. Por favor, inténtalo de nuevo.");
     }
   };
+  
 
   const cancelProfile = () => {
     navigation.goBack();
@@ -352,7 +395,7 @@ const EditProfile = ({ navigation }) => {
           <Icon name="fingerprint" size={20} color="#666" style={styles.inputIcon} />
           <TextInput
             style={styles.input}
-            placeholder="RFC"
+            placeholder="RFC (Opcional)"
             value={rfc}
             onChangeText={(text) => setRfc(text)}
             maxLength={13}

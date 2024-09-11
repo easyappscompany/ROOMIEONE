@@ -77,7 +77,7 @@ const Profile = () => {
 
             setGender(userData.gender || "");
             setIne(userData.ine || "");
-            setRfc(userData.rfc || "");
+            setRfc(userData.rfc || "Sin RFC"); // Aquí haces el cambio
             setCountry(userData.country || "");
             setState(userData.state || "");
             setCity(userData.city || "");
@@ -145,9 +145,9 @@ const Profile = () => {
     }
   };
 
-  useEffect(() => {
+  {/*useEffect(() => {
     console.log("userPhotos:", userPhotos);
-  }, [userPhotos]);
+  }, [userPhotos]); */}
 
   return (
     <Block flex style={styles.profile}>

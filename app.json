@@ -29,6 +29,11 @@
     "description": "Argon React Native, based on Argon Design System. Coded by Creative Tim",
     "android": {
       "package": "com.easyappscompany.argonfreereactnative"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "3e314154-048a-421e-8c34-6036da360968"
+      }
     }
   }
 }
