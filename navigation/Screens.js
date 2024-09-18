@@ -21,7 +21,7 @@ import MyRooms from "../screens/MyRooms";
 import EditRoom from "../screens/EditRoom";
 import RoomDetails from "../screens/RoomDetails";
 import MyRoomDetails from "../screens/MyRoomDetails";
-
+import FilteredRoomsScreen from "../screens/FilteredRoomsScreen";
 const { width } = Dimensions.get("screen");
 
 const Stack = createStackNavigator();
@@ -71,6 +71,7 @@ function HomeStack() {
       <Stack.Screen name="Chat" component={ChatScreen} />
       <Stack.Screen name="Favoritos" component={FavoriteAdsScreen} />
       <Stack.Screen name="Preferences" component={PreferencesScreen} />
+      <Stack.Screen name="FilteredRoomsScreen" component={FilteredRoomsScreen} />
       <Stack.Screen name="Searches" component={Searches} />
       <Stack.Screen name="RoomSearch" component={RoomSearch} />
       <Stack.Screen name="MyRoomDetails" component={MyRoomDetails} />

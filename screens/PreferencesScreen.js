@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -10,24 +10,135 @@ import {
 import { RadioButton } from "react-native-paper";
 import { Picker } from "@react-native-picker/picker";
 import Icon from "react-native-vector-icons/MaterialIcons";
+import { collection, query, where, getDocs } from "firebase/firestore";
+import { db } from "../config";
+import { getCountries, getStates, getCities } from "../apiService";
 
 export default function PreferencesScreen({ navigation }) {
-  const [movingWith, setMovingWith] = useState("no");
+  const [movingWith, setMovingWith] = useState("");
   const [companion, setCompanion] = useState("");
-  const [location, setLocation] = useState("");
-  const [locationType, setLocationType] = useState("pais");
+  const [country, setCountry] = useState("");
+  const [countries, setCountries] = useState([]);
+  const [state, setState] = useState("");
+  const [states, setStates] = useState([]);
+  const [city, setCity] = useState("");
+  const [cities, setCities] = useState([]);
   const [minBudget, setMinBudget] = useState("");
   const [maxBudget, setMaxBudget] = useState("");
+  const [searchText, setSearchText] = useState(""); // Input de búsqueda
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchCountries = async () => {
+      try {
+        const fetchedCountries = await getCountries();
+        setCountries(fetchedCountries);
+      } catch (error) {
+        console.error("Error al obtener los países:", error);
+      }
+    };
+
+    fetchCountries();
+  }, []);
+
+  useEffect(() => {
+    const fetchStates = async () => {
+      if (country) {
+        try {
+          const fetchedStates = await getStates(country);
+          setStates(fetchedStates);
+          setState("");
+          setCity("");
+        } catch (error) {
+          console.error(`Error al obtener los estados de ${country}:`, error);
+        }
+      }
+    };
+
+    fetchStates();
+  }, [country]);
+
+  useEffect(() => {
+    const fetchCities = async () => {
+      if (country && state) {
+        try {
+          const fetchedCities = await getCities(country, state);
+          setCities(fetchedCities);
+        } catch (error) {
+          console.error(`Error al obtener las ciudades de ${state}:`, error);
+        }
+      }
+    };
+
+    fetchCities();
+  }, [state]);
 
   const isFormComplete = () => {
     return (
-      location !== "" ||
+      country !== "" ||
+      state !== "" ||
+      city !== "" ||
       minBudget !== "" ||
       maxBudget !== "" ||
+      searchText !== "" ||
       (movingWith === "si" && companion !== "")
     );
   };
 
+  const handleSearch = async () => {
+    setLoading(true);
+    try {
+      let roomsQuery = collection(db, "rooms");
+      const conditions = [];
+  
+      // Filtros de ubicación
+      if (city) {
+        conditions.push(where("city", "==", city));
+      } else if (state) {
+        conditions.push(where("state", "==", state));
+      } else if (country) {
+        conditions.push(where("country", "==", country));
+      }
+  
+      // Filtros de presupuesto
+      if (minBudget) {
+        conditions.push(where("monthlyRent", ">=", parseInt(minBudget)));
+      }
+      if (maxBudget) {
+        conditions.push(where("monthlyRent", "<=", parseInt(maxBudget)));
+      }
+  
+      // Ejecuta la consulta en Firestore con los filtros disponibles
+      if (conditions.length > 0) {
+        roomsQuery = query(roomsQuery, ...conditions);
+      }
+  
+      const querySnapshot = await getDocs(roomsQuery);
+      let roomsList = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+  
+      if (searchText.trim()) {
+        const searchWords = searchText.trim().toLowerCase().split(",").map(word => word.trim());
+
+        roomsList = roomsList.filter((room) =>
+          searchWords.some((word) =>
+            room.description.toLowerCase().includes(word)
+          )
+        );
+      }
+  
+      // Navegar a la pantalla con los resultados filtrados
+      navigation.navigate("FilteredRoomsScreen", { rooms: roomsList });
+    } catch (error) {
+      console.error("Error al buscar habitaciones: ", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  
   return (
     <View style={styles.container}>
       <TouchableOpacity
@@ -43,41 +154,75 @@ export default function PreferencesScreen({ navigation }) {
           Puedes cambiar tus preferencias cuando quieras.
         </Text>
 
+        <Text style={styles.label}>BÚSQUEDA</Text>
+        <View style={styles.inputContainer}>
+          <Icon name="search" size={24} color="#888" style={styles.icon} />
+          <TextInput
+            style={styles.input}
+            placeholder="Busca por palabras clave (ej: wifi, comedor, terraza)"
+            value={searchText}
+            onChangeText={setSearchText}
+          />
+        </View>
+
         <Text style={styles.label}>UBICACIÓN</Text>
 
+        {/* Picker para País */}
         <View style={styles.pickerContainer}>
           <Icon name="place" size={24} color="#888" style={styles.pickerIcon} />
           <Picker
-            selectedValue={locationType}
-            onValueChange={(itemValue) => setLocationType(itemValue)}
+            selectedValue={country}
+            onValueChange={(itemValue) => setCountry(itemValue)}
             style={styles.picker}
             dropdownIconColor="#888"
           >
-            <Picker.Item label="Buscar por país" value="pais" />
-            <Picker.Item label="Buscar por estado" value="estado" />
-            <Picker.Item label="Buscar por ciudad" value="ciudad" />
+            <Picker.Item label="Selecciona un país" value="" />
+            {countries.map((country, index) => (
+              <Picker.Item key={index} label={country.name} value={country.iso2} />
+            ))}
           </Picker>
         </View>
 
-        <View style={styles.inputContainer}>
-          <Icon name="place" size={24} color="#888" style={styles.icon} />
-          <TextInput
-            style={styles.input}
-            placeholder={`Introduce un ${locationType}`}
-            value={location}
-            onChangeText={setLocation}
-          />
-        </View>
+        {/* Picker para Estado */}
+        {country && (
+          <View style={styles.pickerContainer}>
+            <Icon name="place" size={24} color="#888" style={styles.pickerIcon} />
+            <Picker
+              selectedValue={state}
+              onValueChange={(itemValue) => setState(itemValue)}
+              style={styles.picker}
+              dropdownIconColor="#888"
+            >
+              <Picker.Item label="Selecciona un estado" value="" />
+              {states.map((state, index) => (
+                <Picker.Item key={index} label={state.name} value={state.iso2} />
+              ))}
+            </Picker>
+          </View>
+        )}
+
+        {/* Picker para Ciudad */}
+        {state && (
+          <View style={styles.pickerContainer}>
+            <Icon name="place" size={24} color="#888" style={styles.pickerIcon} />
+            <Picker
+              selectedValue={city}
+              onValueChange={(itemValue) => setCity(itemValue)}
+              style={styles.picker}
+              dropdownIconColor="#888"
+            >
+              <Picker.Item label="Selecciona una ciudad" value="" />
+              {cities.map((city, index) => (
+                <Picker.Item key={index} label={city.name} value={city.name} />
+              ))}
+            </Picker>
+          </View>
+        )}
 
         <Text style={styles.label}>PRESUPUESTO MENSUAL</Text>
         <View style={styles.budgetContainer}>
           <View style={styles.budgetInputContainer}>
-            <Icon
-              name="attach-money"
-              size={24}
-              color="#888"
-              style={styles.icon}
-            />
+            <Icon name="attach-money" size={24} color="#888" style={styles.icon} />
             <TextInput
               style={styles.input}
               placeholder="MIN"
@@ -87,12 +232,7 @@ export default function PreferencesScreen({ navigation }) {
             />
           </View>
           <View style={styles.budgetInputContainer}>
-            <Icon
-              name="attach-money"
-              size={24}
-              color="#888"
-              style={styles.icon}
-            />
+            <Icon name="attach-money" size={24} color="#888" style={styles.icon} />
             <TextInput
               style={styles.input}
               placeholder="MAX"
@@ -105,9 +245,7 @@ export default function PreferencesScreen({ navigation }) {
 
         <Text style={styles.label}>¿CUARTO COMPARTIDO?</Text>
         <RadioButton.Group
-          onValueChange={(value) =>
-            setMovingWith(movingWith === value ? null : value)
-          }
+          onValueChange={(value) => setMovingWith(movingWith === value ? null : value)}
           value={movingWith}
         >
           <View style={styles.radioOption}>
@@ -141,9 +279,12 @@ export default function PreferencesScreen({ navigation }) {
               ? styles.searchButtonActive
               : styles.searchButtonInactive,
           ]}
+          onPress={handleSearch}
           disabled={!isFormComplete()}
         >
-          <Text style={styles.searchButtonText}>Aplicar filtros</Text>
+          <Text style={styles.searchButtonText}>
+            {loading ? "Buscando..." : "Aplicar filtros"}
+          </Text>
         </TouchableOpacity>
       </ScrollView>
     </View>

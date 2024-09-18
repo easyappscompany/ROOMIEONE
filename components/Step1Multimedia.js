@@ -181,7 +181,7 @@ const Step1Multimedia = ({ handleSubmit }) => {
       const roomData = {
         title,
         description,
-        monthlyRent,
+        monthlyRent: parseFloat(monthlyRent) || 0,
         country,
         state,
         city,
@@ -339,7 +339,7 @@ const Step1Multimedia = ({ handleSubmit }) => {
         placeholder="$1000"
         style={styles.input}
         value={monthlyRent}
-        onChangeText={setMonthlyRent}
+        onChangeText={(value) => setMonthlyRent(parseFloat(value) || 0)}
         keyboardType="numeric"
       />
 
@@ -352,7 +352,7 @@ const Step1Multimedia = ({ handleSubmit }) => {
       </View>
 
       <TouchableOpacity style={styles.submitButton} onPress={submitRoomData}>
-        <Text style={styles.submitButtonText}>Siguiente</Text>
+        <Text style={styles.submitButtonText}>Publicar</Text>
       </TouchableOpacity>
     </ScrollView>
   );

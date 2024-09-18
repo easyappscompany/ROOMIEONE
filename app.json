@@ -17,8 +17,7 @@
       "backgroundColor": "#ffffff"
     },
     "updates": {
-      "fallbackToCacheTimeout": 0,
-      "expoUsername": "easyappscompany"
+      "fallbackToCacheTimeout": 0
     },
     "assetBundlePatterns": [
       "**/*"
@@ -34,6 +33,7 @@
       "eas": {
         "projectId": "3e314154-048a-421e-8c34-6036da360968"
       }
-    }
+    },
+    "owner": "easyappscompany"
   }
 }
