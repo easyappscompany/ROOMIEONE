@@ -14,12 +14,16 @@ import { Block, Text } from "galio-framework";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { getAuth } from "firebase/auth";
-import { getFirestore, doc, getDoc } from "firebase/firestore";
+import { getFirestore, doc, getDoc, updateDoc } from "firebase/firestore";
 import { useFocusEffect } from "@react-navigation/native";
+import firebase from 'firebase/app';
+import 'firebase/firestore';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width } = Dimensions.get("screen");
 
 const Profile = () => {
+  
   const navigation = useNavigation();
   const route = useRoute();
   const [userName, setUserName] = useState("Cargando...");
@@ -31,6 +35,7 @@ const Profile = () => {
   const scaleValue = useRef(new Animated.Value(0)).current;
   const [currentIndex, setCurrentIndex] = useState(0);
   const scrollViewRef = useRef(null);
+  const [isSubscribed, setIsSubscribed] = useState(false); // Estado para la suscripción
 
   // Nuevos estados
   const [dob, setDob] = useState("");
@@ -61,7 +66,7 @@ const Profile = () => {
 
           if (userSnap.exists()) {
             const userData = userSnap.data();
-
+            setIsSubscribed(userData.isSubscribed || false); // Verifica si está suscrito
             // Actualiza el estado con todas las fotos si existen, si no, usa una predeterminada
             const photoURLs =
               userData.photosURL?.length > 0
@@ -94,6 +99,23 @@ const Profile = () => {
       loadUserData();
     }, [])
   );
+
+  const handleSubscription = async () => {
+    const auth = getAuth();
+    const user = auth.currentUser;
+
+    if (user) {
+      const db = getFirestore();
+      const userDoc = doc(db, "users", user.email);
+
+      // Simulamos la suscripción cambiando el valor de isSubscribed
+      await updateDoc(userDoc, {
+        isSubscribed: !isSubscribed
+      });
+
+      setIsSubscribed(!isSubscribed); // Actualizamos el estado local
+    }
+  };
 
   const handleLogout = () => {
     const auth = getAuth();
@@ -167,6 +189,26 @@ const Profile = () => {
                 {userEmail}
               </Text>
             </Block>
+
+             {/* Botón de suscripción */}
+             <Block style={styles.subscriptionButton}>
+              <TouchableOpacity onPress={handleSubscription}>
+                <View
+                  style={[
+                    styles.subscriptionButtonContainer,
+                    { backgroundColor: isSubscribed ? "#FF6347" : "#00c853" }
+                  ]}
+                >
+                  <Text style={styles.subscriptionButtonText}>
+                    {isSubscribed ? "Cancelar suscripción" : "Suscribirse a Premium"}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+              {isSubscribed && (
+                <Text style={styles.subscribedText}>Estás suscrito a Premium</Text>
+              )}
+            </Block>
+
             <Block style={styles.editProfileButton}>
               <TouchableOpacity
                 onPress={() => navigation.navigate("EditProfile")}
@@ -517,6 +559,24 @@ const styles = StyleSheet.create({
     top: 10,
     right: 10,
     zIndex: 1,
+  },
+  subscriptionButton: {
+    marginTop: 20,
+    alignItems: "center",
+  },
+  subscriptionButtonContainer: {
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 30,
+  },
+  subscriptionButtonText: {
+    color: "#fff",
+    fontSize: 16,
+  },
+  subscribedText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: "#FF6347",
   },
 });
 
