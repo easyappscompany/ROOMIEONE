@@ -31,62 +31,7 @@ const Step1Multimedia = ({ handleSubmit }) => {
   const [address, setAddress] = useState("");
   const [houseNumber, setHouseNumber] = useState("");
   const [depositRequired, setDepositRequired] = useState(false);
-  const [isVisible, setIsVisible] = useState(true); // Nuevo estado para el campo isVisible
-  const [buttonActive, setButtonActive] = useState(true);
   const navigation = useNavigation();
-  const [latitud, setLatitud] = useState("");  // Nuevo estado para latitud
-  const [longitud, setLongitud] = useState(""); // Nuevo estado para longitud
-
-  // Función para verificar si el usuario está suscrito
-  const checkSubscription = async (email) => {
-    try {
-      const userDoc = await db.collection("users").doc(email).get();
-      if (userDoc.exists) {
-        const isSubscribed = userDoc.data().isSubscribed;
-        return isSubscribed;
-      } else {
-        console.log("No se encontró el documento del usuario.");
-        return false;
-      }
-    } catch (error) {
-      console.error("Error al verificar la suscripción:", error);
-      return false;
-    }
-  };
-
-  const checkRoomPublished = async (email) => {
-    try {
-      const roomsQuery = await db
-        .collection("rooms")
-        .where("userEmail", "==", email)
-        .get();
-      return !roomsQuery.empty;
-    } catch (error) {
-      console.error("Error al verificar los cuartos publicados:", error);
-      return false;
-    }
-  };
-
-  // Función que combina ambas verificaciones
-  const verifyUserStatus = async (email) => {
-    const isSubscribed = await checkSubscription(email);
-    const hasPublishedRoom = await checkRoomPublished(email);
-
-    // Si el usuario no está suscrito y tiene un cuarto publicado, desactiva el botón
-    if (!isSubscribed && hasPublishedRoom) {
-      setButtonActive(false);
-    } else {
-      setButtonActive(true);
-    }
-  };
-
-  useEffect(() => {
-    const user = auth.currentUser;
-    if (user) {
-      const userEmail = user.email;
-      verifyUserStatus(userEmail);
-    }
-  }, []);
 
   useEffect(() => {
     const fetchCountries = async () => {
@@ -374,37 +319,17 @@ const Step1Multimedia = ({ handleSubmit }) => {
 
       <Text style={styles.inputLabel}>Ciudad</Text>
       <View style={styles.inputContainer}>
-        <Picker
-          selectedValue={city}
-          style={styles.picker}
-          onValueChange={(itemValue) => setCity(itemValue)}
-        >
-          <Picker.Item label="Seleccione ciudad" value="" />
-          {cities.map((city, index) => (
-            <Picker.Item key={index} label={city.name} value={city.name} />
-          ))}
-        </Picker>
-      </View>
-          
-       {/* Input para la latitud */}
-       <Text style={styles.inputLabel}>Latitud</Text>
-      <TextInput
-        placeholder="Ej. 19.4326"
-        style={styles.input}
-        value={latitud}
-        onChangeText={setLatitud}
-        keyboardType="numeric" // Para limitar el input a números
-      />
-
-      {/* Input para la longitud */}
-      <Text style={styles.inputLabel}>Longitud</Text>
-      <TextInput
-        placeholder="Ej. -99.1332"
-        style={styles.input}
-        value={longitud}
-        onChangeText={setLongitud}
-        keyboardType="numeric" // Para limitar el input a números
-      />
+          <Picker
+            selectedValue={city}
+            style={styles.picker}
+            onValueChange={(itemValue) => setCity(itemValue)}
+          >
+            <Picker.Item label="Seleccione ciudad" value="" />
+            {cities.map((city, index) => (
+              <Picker.Item key={index} label={city.name} value={city.name} />
+            ))}
+          </Picker>
+        </View>
 
       <Text style={styles.inputLabel}>Dirección</Text>
       <TextInput
