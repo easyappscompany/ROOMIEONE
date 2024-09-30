@@ -25,10 +25,10 @@ const LoginScreen = () => {
 
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
-        // Usuario autenticado, redirigir a Inicio
+        // Usuario autenticado, redirigir a la pantalla Home
         navigation.navigate('Home');
       } else {
-        // Usuario no autenticado, mantener en Login
+        // Usuario no autenticado
         console.log('No hay usuario autenticado');
       }
     });
@@ -44,11 +44,12 @@ const LoginScreen = () => {
         const userDoc = await userRef.get();
     
         if (!userDoc.exists) {
+          // El usuario no existe, registrar
           await userRef.set({
             name: userInfo.name,
             email: userInfo.email,
             photo: userInfo.picture,
-            additionalData: {} 
+            termsAccepted: false, // Inicialmente, no ha aceptado los términos
           });
         }
       } catch (error) {
@@ -68,6 +69,19 @@ const LoginScreen = () => {
       }
     };
 
+    const checkTermsAccepted = async (userEmail) => {
+      const userRef = firebase.firestore().collection('users').doc(userEmail);
+      const userDoc = await userRef.get();
+    
+      if (userDoc.exists && userDoc.data().termsAccepted) {
+        // Si ya aceptó los términos, redirigir a Home
+        navigation.navigate('Inicio');
+      } else {
+        // Si no ha aceptado, redirigir a la pantalla de términos
+        navigation.navigate('Terms', { email: userEmail });
+      }
+    };
+
     const fetchUserInfo = async (accessToken) => {
       try {
         const response = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
@@ -80,8 +94,9 @@ const LoginScreen = () => {
         await AsyncStorage.setItem('userPhoto', userInfo.picture);
         await AsyncStorage.setItem('userEmail', userInfo.email); 
         await AsyncStorage.setItem('userToken', accessToken);
-    
-        navigation.navigate('Home');
+
+        // Verifica si el usuario ya ha aceptado los términos
+        checkTermsAccepted(userInfo.email);
       } catch (error) {
         console.error('Error fetching user info:', error);
       }

@@ -13,9 +13,19 @@ import {
 import { Block, Text } from "galio-framework";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { getAuth } from "firebase/auth";
-import { getFirestore, doc, getDoc } from "firebase/firestore";
+import { getAuth, deleteUser } from "firebase/auth";
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  updateDoc,
+  deleteDoc,
+} from "firebase/firestore";
 import { useFocusEffect } from "@react-navigation/native";
+import firebase from "firebase/app";
+import "firebase/firestore";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Alert } from "react-native";
 
 const { width } = Dimensions.get("screen");
 
@@ -31,6 +41,7 @@ const Profile = () => {
   const scaleValue = useRef(new Animated.Value(0)).current;
   const [currentIndex, setCurrentIndex] = useState(0);
   const scrollViewRef = useRef(null);
+  const [isSubscribed, setIsSubscribed] = useState(false); // Estado para la suscripción
 
   // Nuevos estados
   const [dob, setDob] = useState("");
@@ -61,7 +72,7 @@ const Profile = () => {
 
           if (userSnap.exists()) {
             const userData = userSnap.data();
-
+            setIsSubscribed(userData.isSubscribed || false); // Verifica si está suscrito
             // Actualiza el estado con todas las fotos si existen, si no, usa una predeterminada
             const photoURLs =
               userData.photosURL?.length > 0
@@ -95,11 +106,32 @@ const Profile = () => {
     }, [])
   );
 
-  const handleLogout = () => {
+  const handleSubscription = async () => {
     const auth = getAuth();
-    auth.signOut().then(() => {
-      navigation.navigate("Login");
-    });
+    const user = auth.currentUser;
+
+    if (user) {
+      const db = getFirestore();
+      const userDoc = doc(db, "users", user.email);
+
+      // Simulamos la suscripción cambiando el valor de isSubscribed
+      await updateDoc(userDoc, {
+        isSubscribed: !isSubscribed,
+      });
+
+      setIsSubscribed(!isSubscribed); // Actualizamos el estado local
+    }
+  };
+
+  const handleLogout = async () => {
+    const auth = getAuth();
+    try {
+      await AsyncStorage.clear(); // Limpiar el AsyncStorage
+      await auth.signOut(); // Cerrar sesión en Firebase
+      navigation.navigate("Login"); // Redirigir a la pantalla de Login
+    } catch (error) {
+      console.error("Error al cerrar sesión:", error);
+    }
   };
 
   const handleImagePress = () => {
@@ -145,9 +177,52 @@ const Profile = () => {
     }
   };
 
-  {/*useEffect(() => {
+  // Función para eliminar la cuenta
+  const handleDeleteAccount = async () => {
+    const auth = getAuth();
+    const user = auth.currentUser;
+
+    if (user) {
+      try {
+        const db = getFirestore();
+        const userDoc = doc(db, "users", user.email);
+
+        // Confirmación de eliminación
+        Alert.alert(
+          "Eliminar cuenta",
+          "¿Estás seguro de que deseas eliminar tu cuenta? Esta acción no se puede deshacer.",
+          [
+            {
+              text: "Cancelar",
+              style: "cancel",
+            },
+            {
+              text: "Eliminar",
+              onPress: async () => {
+                // Eliminar el documento del usuario en Firestore
+                await deleteDoc(userDoc);
+
+                // Eliminar el usuario de Firebase Authentication
+                await deleteUser(user);
+
+                // Redirigir al usuario a la pantalla de inicio de sesión
+                navigation.navigate("Login");
+              },
+              style: "destructive",
+            },
+          ]
+        );
+      } catch (error) {
+        console.error("Error al eliminar la cuenta:", error);
+      }
+    }
+  };
+
+  {
+    /*useEffect(() => {
     console.log("userPhotos:", userPhotos);
-  }, [userPhotos]); */}
+  }, [userPhotos]); */
+  }
 
   return (
     <Block flex style={styles.profile}>
@@ -167,6 +242,30 @@ const Profile = () => {
                 {userEmail}
               </Text>
             </Block>
+
+            {/* Botón de suscripción */}
+            <Block style={styles.subscriptionButton}>
+              <TouchableOpacity onPress={handleSubscription}>
+                <View
+                  style={[
+                    styles.subscriptionButtonContainer,
+                    { backgroundColor: isSubscribed ? "#FF6347" : "#00c853" },
+                  ]}
+                >
+                  <Text style={styles.subscriptionButtonText}>
+                    {isSubscribed
+                      ? "Cancelar suscripción"
+                      : "Suscribirse a Premium"}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+              {isSubscribed && (
+                <Text style={styles.subscribedText}>
+                  Estás suscrito a Premium
+                </Text>
+              )}
+            </Block>
+
             <Block style={styles.editProfileButton}>
               <TouchableOpacity
                 onPress={() => navigation.navigate("EditProfile")}
@@ -239,6 +338,15 @@ const Profile = () => {
               <TouchableOpacity onPress={handleLogout}>
                 <View style={styles.logoutButtonContainer}>
                   <Text style={styles.logoutButtonText}>Cerrar sesión</Text>
+                </View>
+              </TouchableOpacity>
+            </Block>
+            <Block style={styles.deleteAccountButton}>
+              <TouchableOpacity onPress={handleDeleteAccount}>
+                <View style={styles.deleteAccountButtonContainer}>
+                  <Text style={styles.deleteAccountButtonText}>
+                    Eliminar cuenta
+                  </Text>
                 </View>
               </TouchableOpacity>
             </Block>
@@ -517,6 +625,39 @@ const styles = StyleSheet.create({
     top: 10,
     right: 10,
     zIndex: 1,
+  },
+  subscriptionButton: {
+    marginTop: 20,
+    alignItems: "center",
+  },
+  subscriptionButtonContainer: {
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 30,
+  },
+  subscriptionButtonText: {
+    color: "#fff",
+    fontSize: 16,
+  },
+  subscribedText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: "#FF6347",
+  },
+  deleteAccountButton: {
+    marginTop: 20,
+    alignItems: 'center',
+  },
+  deleteAccountButtonContainer: {
+    backgroundColor: '#ff5252',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+  },
+  deleteAccountButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
 

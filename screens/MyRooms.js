@@ -52,36 +52,40 @@ export default function MyRooms() {
 
   return (
     <View style={styles.container}>
-      {rooms.map((room) => (
-        <View key={room.id} style={styles.roomContainer}>
-          {/* Imagen y detalles del cuarto */}
-          <TouchableOpacity
-            onPress={() =>
-              navigation.navigate("MyRoomDetails", { roomId: room.id })
-            }
-          >
-            <Image
-              style={styles.roomImage}
-              source={{
-                uri: room.imageUrls ? room.imageUrls[0] : "https://via.placeholder.com/150",
-              }}
-            />
-            <View style={styles.textOverlay}>
-              <Text style={styles.roomTitle}>{room.title}</Text>
-              <Text style={styles.roomPrice}>${room.monthlyRent}/mes</Text>
-              <Text style={styles.roomCountry}>{room.country}</Text>
-            </View>
-          </TouchableOpacity>
-
-          {/* Botón para editar el cuarto (ahora un icono dentro de la card) */}
-          <TouchableOpacity
-            style={styles.editIcon}
-            onPress={() => navigation.navigate("EditRoom", { roomId: room.id })}
-          >
-            <Icon name="edit" size={20} color="#fff" />
-          </TouchableOpacity>
-        </View>
-      ))}
+      {rooms.length === 0 ? (
+        <Text style={styles.noRoomsText}>No tienes cuartos publicados</Text>
+      ) : (
+        rooms.map((room) => (
+          <View key={room.id} style={styles.roomContainer}>
+            {/* Imagen y detalles del cuarto */}
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate("MyRoomDetails", { roomId: room.id })
+              }
+            >
+              <Image
+                style={styles.roomImage}
+                source={{
+                  uri: room.imageUrls ? room.imageUrls[0] : "https://via.placeholder.com/150",
+                }}
+              />
+              <View style={styles.textOverlay}>
+                <Text style={styles.roomTitle}>{room.title}</Text>
+                <Text style={styles.roomPrice}>${room.monthlyRent}/mes</Text>
+                <Text style={styles.roomCountry}>{room.country}</Text>
+              </View>
+            </TouchableOpacity>
+  
+            {/* Botón para editar el cuarto */}
+            <TouchableOpacity
+              style={styles.editIcon}
+              onPress={() => navigation.navigate("EditRoom", { roomId: room.id })}
+            >
+              <Icon name="edit" size={20} color="#fff" />
+            </TouchableOpacity>
+          </View>
+        ))
+      )}
 
       <TouchableOpacity
         style={styles.publishButton}
@@ -100,7 +104,7 @@ export default function MyRooms() {
 
       {/* Menú de navegación inferior */}
       <View style={styles.footer}>
-        <TouchableOpacity onPress={() => navigation.navigate("Home")}>
+        <TouchableOpacity onPress={() => navigation.navigate("Inicio")}>
           <Ionicons
             name="home-outline"
             size={24}
@@ -243,4 +247,11 @@ const styles = StyleSheet.create({
     marginLeft: -5,
     marginTop: 4,
   },
+  noRoomsText: {
+    fontSize: 18,
+    color: "#333",
+    textAlign: "center",
+    marginTop: 20,
+  },
+  
 });

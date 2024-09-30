@@ -40,6 +40,7 @@ const EditRoomScreen = ({ route }) => {
   const [depositRequired, setDepositRequired] = useState(false);
   const navigation = useNavigation();
   const { roomId } = route.params;
+  const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
     const fetchRoomData = async () => {
@@ -58,6 +59,7 @@ const EditRoomScreen = ({ route }) => {
           setHouseNumber(roomData.houseNumber);
           setDepositRequired(roomData.depositRequired);
           setImages(roomData.imageUrls.map((url) => ({ uri: url })));
+          setIsVisible(roomData.isVisible);
         }
       } catch (error) {
         console.error("Error al obtener los datos del cuarto:", error);
@@ -105,23 +107,26 @@ const EditRoomScreen = ({ route }) => {
         console.warn("Country or state is empty, skipping fetch cities.");
         return;
       }
-  
+
       try {
         const fetchedCities = await getCities(country, state);
-  
+
         // Añadir validación adicional
         if (!fetchedCities || !Array.isArray(fetchedCities)) {
-          console.error("Fetched cities is not an array or is undefined:", fetchedCities);
+          console.error(
+            "Fetched cities is not an array or is undefined:",
+            fetchedCities
+          );
           setCities([]); // Set cities to empty array to avoid lingering data
           return;
         }
-  
+
         setCities(fetchedCities);
       } catch (error) {
         console.error("Error fetching cities:", error);
       }
     };
-  
+
     // Llama a la función solo si country y state están definidos
     if (country && state) {
       fetchCities();
@@ -203,6 +208,7 @@ const EditRoomScreen = ({ route }) => {
         houseNumber: houseNumber || "",
         monthlyRent: monthlyRent || "",
         depositRequired: depositRequired || false,
+        isVisible: isVisible,
       };
 
       // Elimina cualquier campo con valor vacío o undefined
@@ -227,6 +233,15 @@ const EditRoomScreen = ({ route }) => {
       console.error("Error al actualizar el documento:", error);
     }
   };
+  const fetchRooms = async () => {
+    const roomsQuery = query(
+      collection(db, "rooms"),
+      where("isVisible", "==", true)
+    );
+    const roomSnapshots = await getDocs(roomsQuery);
+    const rooms = roomSnapshots.docs.map((doc) => doc.data());
+    setRooms(rooms);
+  };
 
   return (
     <ScrollView style={styles.container}>
@@ -243,6 +258,14 @@ const EditRoomScreen = ({ route }) => {
             }}
           />
         </TouchableOpacity>
+      </View>
+
+      <View style={styles.switchContainer}>
+        <Text style={styles.switchLabel}>¿Mostrar cuarto?</Text>
+        <Switch
+          value={isVisible}
+          onValueChange={(value) => setIsVisible(value)}
+        />
       </View>
 
       <Text style={styles.sectionTitle}>Añade algunas fotos</Text>
@@ -380,7 +403,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-    padding: 16,
+    padding: 25,
   },
   header: {
     flexDirection: "row",
@@ -473,6 +496,15 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
+  },
+  switchContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 16,
+  },
+  switchLabel: {
+    fontSize: 16,
+    flex: 1,
   },
 });
 

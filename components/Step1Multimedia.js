@@ -12,11 +12,10 @@ import {
 import { Picker } from "@react-native-picker/picker";
 import * as ImagePicker from "expo-image-picker";
 import { useNavigation, CommonActions } from "@react-navigation/native";
-import { getFirestore, collection, addDoc } from "firebase/firestore";
+import { addDoc, collection } from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { getAuth } from "firebase/auth";
+import { auth, db, storage } from "../config"; // Asegúrate de tener bien configurado Firebase en config.js
 import { getCountries, getStates, getCities } from "../apiService";
-import { db, auth, storage } from "../config";
 
 const Step1Multimedia = ({ handleSubmit }) => {
   const [images, setImages] = useState([]);
@@ -32,7 +31,62 @@ const Step1Multimedia = ({ handleSubmit }) => {
   const [address, setAddress] = useState("");
   const [houseNumber, setHouseNumber] = useState("");
   const [depositRequired, setDepositRequired] = useState(false);
+  const [isVisible, setIsVisible] = useState(true); // Nuevo estado para el campo isVisible
+  const [buttonActive, setButtonActive] = useState(true);
   const navigation = useNavigation();
+  const [latitud, setLatitud] = useState("");  // Nuevo estado para latitud
+  const [longitud, setLongitud] = useState(""); // Nuevo estado para longitud
+
+  // Función para verificar si el usuario está suscrito
+  const checkSubscription = async (email) => {
+    try {
+      const userDoc = await db.collection("users").doc(email).get();
+      if (userDoc.exists) {
+        const isSubscribed = userDoc.data().isSubscribed;
+        return isSubscribed;
+      } else {
+        console.log("No se encontró el documento del usuario.");
+        return false;
+      }
+    } catch (error) {
+      console.error("Error al verificar la suscripción:", error);
+      return false;
+    }
+  };
+
+  const checkRoomPublished = async (email) => {
+    try {
+      const roomsQuery = await db
+        .collection("rooms")
+        .where("userEmail", "==", email)
+        .get();
+      return !roomsQuery.empty;
+    } catch (error) {
+      console.error("Error al verificar los cuartos publicados:", error);
+      return false;
+    }
+  };
+
+  // Función que combina ambas verificaciones
+  const verifyUserStatus = async (email) => {
+    const isSubscribed = await checkSubscription(email);
+    const hasPublishedRoom = await checkRoomPublished(email);
+
+    // Si el usuario no está suscrito y tiene un cuarto publicado, desactiva el botón
+    if (!isSubscribed && hasPublishedRoom) {
+      setButtonActive(false);
+    } else {
+      setButtonActive(true);
+    }
+  };
+
+  useEffect(() => {
+    const user = auth.currentUser;
+    if (user) {
+      const userEmail = user.email;
+      verifyUserStatus(userEmail);
+    }
+  }, []);
 
   useEffect(() => {
     const fetchCountries = async () => {
@@ -54,7 +108,7 @@ const Step1Multimedia = ({ handleSubmit }) => {
           const fetchedStates = await getStates(country);
           setStates(fetchedStates);
           setState(""); // Restablecer el estado cuando se selecciona un nuevo país
-          setCity("");  // Restablecer la ciudad cuando se selecciona un nuevo país
+          setCity(""); // Restablecer la ciudad cuando se selecciona un nuevo país
         } catch (error) {
           console.error(`Error al obtener los estados de ${country}:`, error);
         }
@@ -161,7 +215,7 @@ const Step1Multimedia = ({ handleSubmit }) => {
       alert("Debes subir al menos una foto.");
       return;
     }
-  
+
     try {
       // Subir las imágenes y obtener sus URLs
       const imageUrls = await Promise.all(
@@ -173,10 +227,10 @@ const Step1Multimedia = ({ handleSubmit }) => {
           }
         })
       );
-  
+
       const user = auth.currentUser;
       const userEmail = user?.email;
-  
+
       // Crear el objeto roomData con los datos del cuarto y las URLs de las imágenes
       const roomData = {
         title,
@@ -188,16 +242,19 @@ const Step1Multimedia = ({ handleSubmit }) => {
         address,
         houseNumber,
         depositRequired,
+        isVisible, // Añadir el campo isVisible
         userEmail,
         imageUrls, // Agregar las URLs de las imágenes aquí
+        latitud: parseFloat(latitud),  // Agregar latitud al objeto
+        longitud: parseFloat(longitud), // Agregar longitud al objeto
       };
-  
+
       // Guardar el objeto roomData en la colección 'rooms'
       const roomDocRef = await addDoc(collection(db, "rooms"), roomData);
       console.log("Documento de cuarto escrito con ID: ", roomDocRef.id);
-  
+
       handleSubmit(roomData);
-  
+
       // Navegar de vuelta a Home
       navigation.dispatch(
         CommonActions.reset({
@@ -214,6 +271,13 @@ const Step1Multimedia = ({ handleSubmit }) => {
     <ScrollView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.stepText}>Multimedia</Text>
+        <View style={styles.switchContainer}>
+        <Text style={styles.switchLabel}>¿Cuarto visible?</Text>
+        <Switch
+          value={isVisible}
+          onValueChange={(value) => setIsVisible(value)} // Controlar la visibilidad
+        />
+      </View>
         <TouchableOpacity style={styles.cancelButton} onPress={handleCancel}>
           <Image
             style={styles.cancelIcon}
@@ -278,45 +342,69 @@ const Step1Multimedia = ({ handleSubmit }) => {
 
       <Text style={styles.inputLabel}>País</Text>
       <View style={styles.inputContainer}>
-          <Picker
-            selectedValue={country}
-            style={styles.picker}
-            onValueChange={(itemValue) => setCountry(itemValue)}
-          >
-            <Picker.Item label="Seleccione país" value="" />
-            {countries.map((country, index) => (
-              <Picker.Item key={index} label={country.name} value={country.iso2} />
-            ))}
-          </Picker>
-        </View>
+        <Picker
+          selectedValue={country}
+          style={styles.picker}
+          onValueChange={(itemValue) => setCountry(itemValue)}
+        >
+          <Picker.Item label="Seleccione país" value="" />
+          {countries.map((country, index) => (
+            <Picker.Item
+              key={index}
+              label={country.name}
+              value={country.iso2}
+            />
+          ))}
+        </Picker>
+      </View>
 
       <Text style={styles.inputLabel}>Estado</Text>
       <View style={styles.inputContainer}>
-          <Picker
-            selectedValue={state}
-            style={styles.picker}
-            onValueChange={(itemValue) => setState(itemValue)}
-          >
-            <Picker.Item label="Seleccione estado" value="" />
-            {states.map((state, index) => (
-              <Picker.Item key={index} label={state.name} value={state.iso2} />
-            ))}
-          </Picker>
-        </View>
+        <Picker
+          selectedValue={state}
+          style={styles.picker}
+          onValueChange={(itemValue) => setState(itemValue)}
+        >
+          <Picker.Item label="Seleccione estado" value="" />
+          {states.map((state, index) => (
+            <Picker.Item key={index} label={state.name} value={state.iso2} />
+          ))}
+        </Picker>
+      </View>
 
       <Text style={styles.inputLabel}>Ciudad</Text>
       <View style={styles.inputContainer}>
-          <Picker
-            selectedValue={city}
-            style={styles.picker}
-            onValueChange={(itemValue) => setCity(itemValue)}
-          >
-            <Picker.Item label="Seleccione ciudad" value="" />
-            {cities.map((city, index) => (
-              <Picker.Item key={index} label={city.name} value={city.name} />
-            ))}
-          </Picker>
-        </View>
+        <Picker
+          selectedValue={city}
+          style={styles.picker}
+          onValueChange={(itemValue) => setCity(itemValue)}
+        >
+          <Picker.Item label="Seleccione ciudad" value="" />
+          {cities.map((city, index) => (
+            <Picker.Item key={index} label={city.name} value={city.name} />
+          ))}
+        </Picker>
+      </View>
+          
+       {/* Input para la latitud */}
+       <Text style={styles.inputLabel}>Latitud</Text>
+      <TextInput
+        placeholder="Ej. 19.4326"
+        style={styles.input}
+        value={latitud}
+        onChangeText={setLatitud}
+        keyboardType="numeric" // Para limitar el input a números
+      />
+
+      {/* Input para la longitud */}
+      <Text style={styles.inputLabel}>Longitud</Text>
+      <TextInput
+        placeholder="Ej. -99.1332"
+        style={styles.input}
+        value={longitud}
+        onChangeText={setLongitud}
+        keyboardType="numeric" // Para limitar el input a números
+      />
 
       <Text style={styles.inputLabel}>Dirección</Text>
       <TextInput
@@ -351,9 +439,14 @@ const Step1Multimedia = ({ handleSubmit }) => {
         />
       </View>
 
-      <TouchableOpacity style={styles.submitButton} onPress={submitRoomData}>
-        <Text style={styles.submitButtonText}>Publicar</Text>
-      </TouchableOpacity>
+      <TouchableOpacity
+  style={[styles.submitButton, !buttonActive && styles.disabledButton]}
+  onPress={buttonActive ? submitRoomData : () => alert("Debes suscribirte para publicar otro cuarto.")}
+  disabled={!buttonActive}
+>
+  <Text style={styles.submitButtonText}>Publicar</Text>
+</TouchableOpacity>
+
     </ScrollView>
   );
 };
@@ -362,6 +455,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#ffffff",
+  },
+  disabledButton: {
+    backgroundColor: "gray", // Color para el botón deshabilitado
+  },
+  subscriptionNotice: {
+    color: "red",
+    padding: 10,
+    textAlign: "center",
   },
   header: {
     flexDirection: "row",
@@ -474,6 +575,17 @@ const styles = StyleSheet.create({
     height: 50,
     marginHorizontal: 10,
     marginVertical: 5,
+  },
+  switchContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginVertical: 10,
+    paddingHorizontal: 10,
+  },
+  switchLabel: {
+    fontSize: 18,
+    color: "#333",
   },
 });
 

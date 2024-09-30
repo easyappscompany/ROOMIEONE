@@ -7,7 +7,6 @@ import CustomDrawerContent from '../navigation/Menu';
 // Importar las pantallas necesarias
 import Onboarding from "../screens/Onboarding";
 import Login from "../screens/Login"; // Importa la pantalla de Login
-import PhoneVerificationScreen from "../screens/PhoneVerificationScreen";
 import Home from "../screens/Home";
 import ChatScreen from "../screens/ChatScreen";
 import FavoriteAdsScreen from "../screens/FavoriteAdsScreen";
@@ -22,6 +21,7 @@ import EditRoom from "../screens/EditRoom";
 import RoomDetails from "../screens/RoomDetails";
 import MyRoomDetails from "../screens/MyRoomDetails";
 import FilteredRoomsScreen from "../screens/FilteredRoomsScreen";
+import TermsScreen from "../screens/TermsScreen"; 
 const { width } = Dimensions.get("screen");
 
 const Stack = createStackNavigator();
@@ -32,8 +32,8 @@ function OnboardingStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="Onboarding" component={Onboarding} />
-      <Stack.Screen name="Login" component={Login} /> 
-      <Stack.Screen name="PhoneVerification" component={PhoneVerificationScreen} />
+      <Stack.Screen name="Login" component={Login} />
+      <Stack.Screen name="Terms" component={TermsScreen} /> 
       <Stack.Screen name="Home" component={HomeDrawerStack} />
     </Stack.Navigator>
   );

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, StyleSheet, ScrollView, Dimensions, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, Image, StyleSheet, ScrollView, Dimensions, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { db } from '../config';
 import Icon from 'react-native-vector-icons/FontAwesome';
-const { width } = Dimensions.get('window'); 
+const { width } = Dimensions.get('window');
 
 export default function MyRoomDetails() {
   const navigation = useNavigation();
@@ -31,6 +31,31 @@ export default function MyRoomDetails() {
     fetchRoomDetails();
   }, [roomId]);
 
+  // Función para eliminar el cuarto
+  const handleDeleteRoom = async () => {
+    Alert.alert(
+      'Confirmar eliminación',
+      '¿Estás seguro de que quieres eliminar este cuarto?',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        {
+          text: 'Eliminar',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await db.collection('rooms').doc(roomId).delete();
+              Alert.alert('Eliminado', 'El cuarto ha sido eliminado.');
+              navigation.navigate('MyRooms'); // Redirigir a la lista de cuartos después de la eliminación
+            } catch (error) {
+              console.error('Error eliminando el cuarto:', error);
+              Alert.alert('Error', 'Hubo un problema al eliminar el cuarto.');
+            }
+          },
+        },
+      ]
+    );
+  };
+
   if (loading) {
     return <ActivityIndicator size="large" color="#00c06b" />;
   }
@@ -44,7 +69,6 @@ export default function MyRoomDetails() {
       </TouchableOpacity>
 
       <ScrollView style={styles.container}>
-
         <View style={styles.carouselContainer}>
           <ScrollView
             horizontal
@@ -56,9 +80,7 @@ export default function MyRoomDetails() {
               <Image key={index} style={styles.image} source={{ uri: imageUrl }} />
             ))}
           </ScrollView>
-
           <Text style={styles.swipeText}>Desliza para ver más</Text>
-
           <View style={styles.indicatorContainer}>
             {room.imageUrls.map((_, index) => (
               <View
@@ -75,13 +97,11 @@ export default function MyRoomDetails() {
         <View style={styles.infoContainer}>
           <Text style={styles.title}>{room.title}</Text>
           <Text style={styles.price}>${room.monthlyRent}/mes</Text>
-
           <View style={styles.detailBox}>
             <Text style={styles.description}>{room.description}</Text>
           </View>
-
           <View style={styles.detailBox}>
-            <Text style={styles.location}><Text style={styles.label}>País:</Text>{room.country}</Text>
+            <Text style={styles.location}><Text style={styles.label}>País:</Text> {room.country}</Text>
             <Text style={styles.detail}><Text style={styles.label}>Estado:</Text> {room.estate}</Text>
             <Text style={styles.detail}><Text style={styles.label}>Ciudad:</Text> {room.city}</Text>
             <Text style={styles.detail}><Text style={styles.label}>Dirección:</Text> {room.address}</Text>
@@ -95,6 +115,11 @@ export default function MyRoomDetails() {
             <Text style={styles.editButtonText}>Editar Cuarto</Text>
           </TouchableOpacity>
 
+          {/* Botón Eliminar Cuarto */}
+          <TouchableOpacity style={styles.deleteButton} onPress={handleDeleteRoom}>
+            <Icon name="trash" size={20} color="#fff" />
+            <Text style={styles.deleteButtonText}>Eliminar Cuarto</Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
     </View>
@@ -218,6 +243,20 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   editButtonText: {
+    color: '#fff',
+    marginLeft: 10,
+    fontSize: 16,
+  },
+  deleteButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#ff4d4f',
+    padding: 10,
+    borderRadius: 8,
+    marginTop: 16,
+    justifyContent: 'center',
+  },
+  deleteButtonText: {
     color: '#fff',
     marginLeft: 10,
     fontSize: 16,

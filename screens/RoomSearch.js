@@ -21,13 +21,14 @@ export default function RoomSearch() {
   const [modalVisible, setModalVisible] = useState(false);
   const [searchText, setSearchText] = useState("");
   const [rooms, setRooms] = useState([]); // Estado para almacenar los cuartos obtenidos de Firestore
-  const [roomPhotos, setRoomPhotos] = useState({}); // Estado para almacenar las fotos de los cuartos
 
   // Obtener cuartos de la colección 'rooms'
   useEffect(() => {
     const fetchRooms = async () => {
       try {
-        const snapshot = await db.collection("rooms").get();
+        const snapshot = await db.collection("rooms")
+          .where("isVisible", "==", true) // Filtra los cuartos donde isVisible es true
+          .get();
         const roomList = snapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
